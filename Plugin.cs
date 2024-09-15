@@ -9,6 +9,7 @@ using UnityEngine;
 using PixelInternalAPI.Extensions;
 using PixelInternalAPI.Classes;
 using System.IO;
+using NewPlusDecorations.Components;
 
 namespace NewPlusDecorations
 {
@@ -52,11 +53,12 @@ namespace NewPlusDecorations
 
 			yield return "Loading misc resources...";
 			ObjectCreationExtension.defaultMaterial = GenericExtensions.FindResourceObjectByName<Material>("Locker_Red"); // Actually a good material, has even lightmap
+			var blackTexture = TextureExtensions.CreateSolidTexture(1, 1, Color.black);
+			var whiteTex = TextureExtensions.CreateSolidTexture(1, 1, Color.white);
 
 			yield return "Creating shelf...";
 
 			// Shelf creation
-			var blackTexture = TextureExtensions.CreateSolidTexture(1, 1, Color.black);
 			var darkWood = Object.Instantiate(man.Get<Texture2D>("woodTexture"));
 			darkWood.name = "Times_darkWood";
 			var shelf = new GameObject("ClosetShelf");
@@ -88,6 +90,49 @@ namespace NewPlusDecorations
 			}
 
 			AddObjectToEditor(shelf.gameObject);
+
+			yield return "Adding columns...";
+			// Some cool decorations
+
+			AddColumn("BigColumn", new(3f, LayerStorage.TileBaseOffset));
+			AddColumn("MediumColumn", new(2f, LayerStorage.TileBaseOffset));
+			AddColumn("SmallColumn", new(1f, LayerStorage.TileBaseOffset));
+			AddColumn("ThinColumn", new(0.35f, LayerStorage.TileBaseOffset));
+
+
+			Column AddColumn(string name, Vector2 size)
+			{
+				var column = new GameObject(name);
+
+				Directions.All().ForEach(columnSide);
+
+				void columnSide(Direction dir)
+				{
+					var planeHolder = new GameObject("PlaneDir_" + dir);
+					planeHolder.transform.SetParent(column.transform);
+					planeHolder.transform.localPosition = dir.ToVector3() * size.x;
+					planeHolder.transform.rotation = dir.GetOpposite().ToRotation();
+					planeHolder.transform.localScale = new(size.x * 0.2f, size.y * 0.1f, 1f);
+
+					var plane = Object.Instantiate(man.Get<GameObject>("PlaneTemplate"), planeHolder.transform);
+					plane.transform.localPosition = Vector3.zero;
+
+					plane.GetComponent<MeshRenderer>().material.SetMainTexture(whiteTex);
+					plane.name = "PlaneRendererDir_" + dir;
+				}
+
+				var colrender = column.GetComponentsInChildren<MeshRenderer>();
+				column.AddContainer(colrender);
+				column.AddBoxCollider(Vector3.zero, new(size.x, size.y, size.x), false);
+				column.AddNavObstacle(new(size.x, size.y, size.x));
+
+				AddObjectToEditor(column);
+				var actualColumn = column.AddComponent<Column>();
+				actualColumn.renderer = colrender;
+				return actualColumn;
+
+
+			}
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
