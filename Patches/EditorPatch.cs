@@ -26,6 +26,9 @@ namespace NewPlusDecorations.Patches
 				new ObjectData(array[0], Vector3.up * 9f, default)
 			]);
 
+			array = [man.Get<GameObject>("editorPrefab_Closet")];
+			MarkRotatingObject(array[0], Vector3.up * 1.5f);
+
 			// Decorations
 			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.zero);
 
@@ -36,16 +39,16 @@ namespace NewPlusDecorations.Patches
 			MarkObject(man.Get<GameObject>("editorPrefab_ThinColumn"), Vector3.up * 5f);
 		}
 
-		static void MarkRotatingObject(GameObject obj, Vector3 offset)
+		static void MarkRotatingObject(GameObject obj, Vector3 offset, bool useActual = false)
 		{
 			markersToAdd.Add(new(obj.name, new(false, null)));
-			BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>(obj.name, obj, offset, false));
+			BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>(obj.name, obj, offset, useActual));
 		}
 
-		static void MarkObject(GameObject obj, Vector3 offset)
+		static void MarkObject(GameObject obj, Vector3 offset, bool useActual = false)
 		{
 			markersToAdd.Add(new(obj.name, new(true, null)));
-			BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>(obj.name, obj, offset, false));
+			BaldiLevelEditorPlugin.editorObjects.Add(EditorObjectType.CreateFromGameObject<EditorPrefab, PrefabLocation>(obj.name, obj, offset, useActual));
 		}
 
 		static void MarkObjectRow(string prebuiltToolName, params ObjectData[] objs) =>
