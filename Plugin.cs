@@ -143,6 +143,7 @@ namespace NewPlusDecorations
 			var closetDoorTexture = TextureExtensions.LoadSpriteSheet(2, 1, 25f, path, "closetdoors.png");
 
 			Renderer[] renderers = new Renderer[6];
+			int rendIdx = 0;
 
 			var closet = new GameObject("Closet")
 			{
@@ -153,41 +154,11 @@ namespace NewPlusDecorations
 			closet.AddComponent<EnvironmentObjectDistributor>();
 			AddObjectToEditor(closet);
 
-			var closetBase = ObjectCreationExtension.CreateCube(closetTexture, false);
-			closetBase.name = "ClosetBase";
-			closetBase.transform.SetParent(closet.transform);
-			closetBase.transform.localPosition = Vector3.down;
-			closetBase.transform.localScale = new(5f, 1f, 5f);
-
-			renderers[0] = closetBase.GetComponent<MeshRenderer>();
-
-			renderers[1] = ClosetSide(Vector3.right * 3f);
-			renderers[2] = ClosetSide(Vector3.left * 3f);
-
-			MeshRenderer ClosetSide(Vector3 offset)
-			{
-				var closetSide = ObjectCreationExtension.CreateCube(closetTexture, false);
-				closetSide.name = "ClosetSide";
-				closetSide.transform.SetParent(closet.transform);
-				closetSide.transform.localPosition = offset + Vector3.up * 2.5f;
-				closetSide.transform.localScale = new(1f, 8f, 5f);
-				return closetSide.GetComponent<MeshRenderer>();
-			}
-
-			closetBase = ObjectCreationExtension.CreateCube(closetTexture, false); // Top
-			closetBase.name = "ClosetTop";
-			closetBase.transform.SetParent(closet.transform);
-			closetBase.transform.localPosition = Vector3.up * 7f;
-			closetBase.transform.localScale = new(7f, 1f, 5f);
-			closetBase.GetComponent<BoxCollider>().size = new(1f, 3f, 1f);
-			renderers[3] = closetBase.GetComponent<MeshRenderer>();
-
-			closetBase = ObjectCreationExtension.CreateCube(closetTexture, false); // Back
-			closetBase.name = "ClosetBack";
-			closetBase.transform.SetParent(closet.transform);
-			closetBase.transform.localPosition = (Vector3.back + Vector3.up) * 3f;
-			closetBase.transform.localScale = new(7f, 9f, 1f);
-			renderers[4] = closetBase.GetComponent<MeshRenderer>();
+			CreateCube("ClosetBase", closetTexture, false, closet.transform, Vector3.down, new(5f, 1f, 5f));
+			CreateCube("ClosetRightSide", closetTexture, false, closet.transform, Vector3.right * 3f + Vector3.up * 2.5f, new(1f, 8f, 5f));
+			CreateCube("ClosetLeftSide", closetTexture, false, closet.transform, Vector3.left * 3f + Vector3.up * 2.5f, new(1f, 8f, 5f));
+			CreateCube("ClosetTop", closetTexture, false, closet.transform, Vector3.up * 7f, new(7f, 1f, 5f)).GetComponent<BoxCollider>().size = new(1f, 3f, 1f);
+			CreateCube("ClosetBack", closetTexture, false, closet.transform, (Vector3.back + Vector3.up) * 3f, new(7f, 9f, 1f));
 
 			var sprite = ObjectCreationExtensions.CreateSpriteBillboard(closetDoorTexture[0], false).AddSpriteHolder(0f, LayerStorage.iClickableLayer);
 			sprite.name = "ClosetDoorTex";
@@ -210,11 +181,32 @@ namespace NewPlusDecorations
 
 			closet.AddContainer(renderers);
 
+			yield return "Adding couch...";
+
+			renderers = new MeshRenderer[4];
+			rendIdx = 0;
+
+			var couch = new GameObject("Couch")
+			{
+				layer = LayerStorage.iClickableLayer
+			};
+
+			couch.AddBoxCollider(Vector3.zero, new(2f, 10f, 2f), false);
+			couch.AddNavObstacle(new(2f, 10f, 2f));
+			AddObjectToEditor(couch);
+
+			var couchTextures = TextureExtensions.LoadTextureSheet(2, 1, path, "couchtexture.png");
+			CreateCube("CouchSit", couchTextures[0], false, couch.transform, Vector3.down * 3.4f, new(4.2f, 0.7f, 4.2f));
+			CreateCubeWithRot("CouchBack", couchTextures[0], false, couch.transform, Vector3.down * 1.51f + Vector3.back * 2f, new(4f, 3.5f, 1f), Vector3.right * 345f);
+			CreateCube("CouchInternalSit", couchTextures[1], false, couch.transform, Vector3.down * 4.5f, new(4.5f, 1.5f, 4.5f));
+			CreateCubeWithRot("CouchInternalBack", couchTextures[1], false, couch.transform, Vector3.down * 1.85f + Vector3.back * 2.7f, new(4.45f, 5f, 0.5f), Vector3.right * 345f);
+
 
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
 			AddDecoration("SmallPottedPlant", "plant.png", 25f, Vector3.up);
+			AddDecoration("TableLightLamp", "tablelamp.png", 25f, Vector3.up * 0.7f);
 
 			void AddDecoration(string name, string fileName, float pixelsPerUnit, Vector3 offset)
 			{
@@ -225,13 +217,31 @@ namespace NewPlusDecorations
 				//"editorPrefab_"
 			}
 
+			GameObject CreateCube(string cubeName, Texture2D texture, bool useUV, Transform parent, Vector3 offset, Vector3 scale)
+			{
+				var cube = ObjectCreationExtension.CreateCube(texture, false);
+				cube.name = cubeName;
+				cube.transform.SetParent(parent);
+				cube.transform.localPosition = offset;
+				cube.transform.localScale = scale;
+				renderers[rendIdx++] = cube.GetComponent<MeshRenderer>();
+				return cube;
+			}
+
+			GameObject CreateCubeWithRot(string cubeName, Texture2D texture, bool useUV, Transform parent, Vector3 offset, Vector3 scale, Vector3 rot)
+			{
+				var co = CreateCube(cubeName, texture, useUV, parent, offset, scale);
+				co.transform.rotation = Quaternion.Euler(rot);
+				return co;
+			}
+
 			yield return "Triggering post setup...";
 
 
 			PostSetup(man);
 		}
 
-		const int loadSteps = 5;
+		const int loadSteps = 6;
 
 		void AddObjectToEditor(GameObject obj)
 		{
@@ -243,6 +253,8 @@ namespace NewPlusDecorations
 		static void PostSetup(AssetManager man) { }
 
 		internal static string path;
-		public static AssetManager man = new();
+		internal static AssetManager man = new();
+		public static T Get<T>(string name) =>
+			man.Get<T>(name);
     }
 }

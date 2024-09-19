@@ -30,5 +30,7 @@ namespace NewPlusDecorations
 			r.renderers = renderers;
 			return r;
 		}
+		internal static void RemoveHitbox(this GameObject obj) =>
+			Object.Destroy(obj.GetComponent<Collider>());
 	}
 }

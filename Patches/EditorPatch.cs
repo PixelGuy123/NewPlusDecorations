@@ -26,11 +26,13 @@ namespace NewPlusDecorations.Patches
 				new ObjectData(array[0], Vector3.up * 9f, default)
 			]);
 
-			array = [man.Get<GameObject>("editorPrefab_Closet")];
-			MarkRotatingObject(array[0], Vector3.up * 1.5f);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Closet"), Vector3.up * 1.5f);
+
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Couch"), Vector3.up * 5.2f);
 
 			// Decorations
-			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.up * 5f);
+			MarkObject(man.Get<GameObject>("editorPrefab_TableLightLamp"), Vector3.up * 5f);
 
 			// Columns
 			MarkObject(man.Get<GameObject>("editorPrefab_BigColumn"), Vector3.up * 5f);
