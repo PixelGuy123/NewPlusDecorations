@@ -195,11 +195,10 @@ namespace NewPlusDecorations
 			couch.AddNavObstacle(new(2f, 10f, 2f));
 			AddObjectToEditor(couch);
 
-			var couchTextures = TextureExtensions.LoadTextureSheet(2, 1, path, "couchtexture.png");
-			CreateCube("CouchSit", couchTextures[0], false, couch.transform, Vector3.down * 3.4f, new(4.2f, 0.7f, 4.2f));
-			CreateCubeWithRot("CouchBack", couchTextures[0], false, couch.transform, Vector3.down * 1.51f + Vector3.back * 2f, new(4f, 3.5f, 1f), Vector3.right * 345f);
-			CreateCube("CouchInternalSit", couchTextures[1], false, couch.transform, Vector3.down * 4.5f, new(4.5f, 1.5f, 4.5f));
-			CreateCubeWithRot("CouchInternalBack", couchTextures[1], false, couch.transform, Vector3.down * 1.85f + Vector3.back * 2.7f, new(4.45f, 5f, 0.5f), Vector3.right * 345f);
+			var couchTexture = AssetLoader.TextureFromFile(Path.Combine(path, "couchtexture.png"));
+			CreateCube("CouchSit", couchTexture, false, couch.transform, Vector3.down * 4.2f, new(4.2f, 2f, 4.2f));
+			CreateCubeWithRot("CouchBack", couchTexture, false, couch.transform, Vector3.down * 1.6f + Vector3.back * 2.35f, new(4f, 3.5f, 1f), Vector3.right * 345f);
+			CreateCube("CouchFeet", closetTexture, false, couch.transform, Vector3.down * 3f, new(1f, 1f, 1f)); // Finish this <<
 
 
 
