@@ -30,6 +30,8 @@ namespace NewPlusDecorations.Patches
 
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Couch"), Vector3.up * 5.2f);
 
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_GrandFatherClock"), Vector3.up * 3.5f);
+
 			// Decorations
 			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.up * 5f);
 			MarkObject(man.Get<GameObject>("editorPrefab_TableLightLamp"), Vector3.up * 5f);

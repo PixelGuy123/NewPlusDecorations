@@ -12,6 +12,6 @@ namespace NewPlusDecorations.Components
 		}
 
 		[SerializeField]
-		internal MeshRenderer[] renderer;
+		internal Renderer[] renderer;
 	}
 }

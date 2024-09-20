@@ -30,7 +30,20 @@ namespace NewPlusDecorations
 			r.renderers = renderers;
 			return r;
 		}
-		internal static void RemoveHitbox(this GameObject obj) =>
+		internal static GameObject RemoveHitbox(this GameObject obj)
+		{
 			Object.Destroy(obj.GetComponent<Collider>());
+			return obj;
+		}
+
+		internal static GameObject SetBoxHitbox(this GameObject obj, float x = -1, float y = -1, float z = -1)
+		{
+			var coll = obj.GetComponent<BoxCollider>();
+			coll.size = new(x == -1 ? coll.size.x : x,
+				y == -1 ? coll.size.y : y,
+				z == -1 ? coll.size.z : z
+				);
+			return obj;
+		}
 	}
 }
