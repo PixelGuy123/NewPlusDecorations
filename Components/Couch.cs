@@ -153,7 +153,7 @@ namespace NewPlusDecorations.Components
 				pm.plm.Entity.SetFrozen(false);
 				Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).UpdateTargets(null, camVal);
 				Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).SetControllable(true);
-				Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).transform.eulerAngles = rotation;
+				pm.transform.eulerAngles = rotation;
 			}
 			beingUsed = false;
 			yield break;
