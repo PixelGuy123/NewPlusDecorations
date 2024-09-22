@@ -231,12 +231,12 @@ namespace NewPlusDecorations
 
 			shelf = new GameObject("WallShelf");
 			shelf.AddNavObstacle(new(9.5f, 2.5f, 4.5f));
-			shelf.AddBoxCollider(Vector3.up * 3f, Vector3.one * 6f, true);
+			shelf.AddBoxCollider(new(0f, 3f, -2.25f), Vector3.one * 6f, true);
 			AddObjectToEditor(shelf);
 
-			CreateCube("ShelfBody", darkWood, false, shelf.transform, Vector3.up * 3f, new(9, 0.7f, 4f)).SetBoxHitbox(y:2.5f);
-			CreateCubeWithRot("ShelfLeftConnection", blackTexture, false, shelf.transform, new(-3f, 1.49f, -1.64f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
-			CreateCubeWithRot("ShelfRightConnection", blackTexture, false, shelf.transform, new(3f, 1.49f, -1.64f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
+			CreateCube("ShelfBody", darkWood, false, shelf.transform, new(0f, 3f, -2.25f), new(9, 0.7f, 4f)).SetBoxHitbox(y:2.5f);
+			CreateCubeWithRot("ShelfLeftConnection", blackTexture, false, shelf.transform, new(-3f, 1.49f, -3.89f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
+			CreateCubeWithRot("ShelfRightConnection", blackTexture, false, shelf.transform, new(3f, 1.49f, -3.89f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
 
 			yield return "Adding long office table...";
 
