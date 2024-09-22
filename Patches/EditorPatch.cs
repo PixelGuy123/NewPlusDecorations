@@ -27,10 +27,10 @@ namespace NewPlusDecorations.Patches
 			]);
 
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Closet"), Vector3.up * 1.5f);
-
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Couch"), Vector3.up * 5.2f);
-
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_GrandFatherClock"), Vector3.up * 3.5f);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_WallShelf"), new(1.75f, 2f, 0f));
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_LongOfficeTable"), Vector3.up * 3.5f);
 
 			// Decorations
 			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.up * 5f);

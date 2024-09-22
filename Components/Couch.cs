@@ -16,7 +16,6 @@ namespace NewPlusDecorations.Components
 			beingUsed = true;
 			camTarget.position = Singleton<CoreGameManager>.Instance.GetCamera(player).transform.position;
 			camTarget.rotation = Singleton<CoreGameManager>.Instance.GetCamera(player).transform.rotation;
-
 			Singleton<CoreGameManager>.Instance.GetCamera(player).UpdateTargets(camTarget, camVal);
 
 			StartCoroutine(PlayerInCouch(Singleton<CoreGameManager>.Instance.GetPlayer(player)));
@@ -28,17 +27,18 @@ namespace NewPlusDecorations.Components
 
 		IEnumerator PlayerInCouch(PlayerManager pm)
 		{
-			Vector3 rotation = Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).transform.eulerAngles;
 			Vector3 tarPos = transform.position + transform.forward * 4.5f;
+			Vector3 rotation = Quaternion.LookRotation(tarPos - transform.position).eulerAngles;
+			pm.transform.eulerAngles = rotation;
 			Vector3 prevPlayerPos = player.transform.position;
 			player.Teleport(tarPos);
 			yield return null;
 			Vector3 pos = player.transform.position;
 
-			
 			tarPos.y = pos.y;
 
-			Vector3 expectedDir = Quaternion.LookRotation(tarPos - transform.position).eulerAngles;
+			Vector3 expectedDir = rotation;
+			expectedDir.x += 5f;
 
 			Vector3 ogDir = camTarget.eulerAngles;
 
@@ -104,22 +104,23 @@ namespace NewPlusDecorations.Components
 				if (pm.transform.position == pos)
 				{
 					expectedDir = rotation;
-					expectedDir.x = 25f;
+					expectedDir.x = 15f;
 					ogDir = camTarget.eulerAngles;
 
-					tarPos = camTarget.position + camTarget.forward * 0.15f;
-					tarPos.y = camTarget.position.y;
+					prevPlayerPos = camTarget.position;
+					tarPos = camTarget.position + camTarget.forward * 2.35f;
+					tarPos.y = camTarget.position.y - 0.78f;
 
 
 					t = 0;
 					t2 = 0;
 					do
 					{
-						t = Mathf.Min(1f, t + (Mathf.Abs(Mathf.Cos(t) * 1.95f) * ec.EnvironmentTimeScale * Time.deltaTime));
-						t2 = Mathf.Min(1f, t2 + (Mathf.Abs(Mathf.Cos(t2) * 4f) * ec.EnvironmentTimeScale * Time.deltaTime));
+						t = Mathf.Min(1f, t + (Mathf.Abs(Mathf.Cos(t) * 2.1f) * ec.EnvironmentTimeScale * Time.deltaTime));
+						t2 = Mathf.Min(1f, t2 + (Mathf.Abs(Mathf.Cos(t2) * 2.5f) * ec.EnvironmentTimeScale * Time.deltaTime));
 
 						camTarget.eulerAngles = Vector3.Lerp(ogDir, expectedDir, t);
-						camTarget.position = Vector3.Lerp(pos, tarPos, t2);
+						camTarget.position = Vector3.Lerp(prevPlayerPos, tarPos, t2);
 
 						if (pm.transform.position != pos)
 							goto endAnimation;

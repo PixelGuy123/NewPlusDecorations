@@ -64,16 +64,16 @@ namespace NewPlusDecorations
 			int rendIdx = 0;
 
 			// Shelf creation
-			var darkWood = Instantiate(man.Get<Texture2D>("woodTexture"));
+			var darkWood = Instantiate(man.Get<Texture2D>("woodTexture")).ApplyLightLevel(-25f);
 			darkWood.name = "Times_darkWood";
 			var shelf = new GameObject("ClosetShelf")
 			{
 				layer = LayerStorage.ignoreRaycast
 			};
-			shelf.gameObject.AddBoxCollider(Vector3.zero, new(4f, 10f, 15f), false);
-			shelf.gameObject.AddNavObstacle(new(4.2f, 10f, 16.3f));
+			shelf.AddBoxCollider(Vector3.zero, new(4f, 10f, 15f), false);
+			shelf.AddNavObstacle(new(4.2f, 10f, 16.3f));
 
-			 CreateCube("ShelfBody", darkWood.ApplyLightLevel(-25f), false, shelf.transform, Vector3.up * 4f, new(4f, 0.7f, 15f)).RemoveHitbox();
+			CreateCube("ShelfBody", darkWood, false, shelf.transform, Vector3.up * 4f, new(4f, 0.7f, 15f)).RemoveHitbox();
 
 			ShelfLegCreator(new(-1.5f, 2.3f, 6.5f));
 			ShelfLegCreator(new(1.5f, 2.3f, -6.5f));
@@ -89,7 +89,7 @@ namespace NewPlusDecorations
 				renderers[rendIdx++] = shelfLeg.GetComponent<MeshRenderer>();
 			}
 
-			shelf.gameObject.AddContainer(renderers);
+			shelf.AddContainer(renderers);
 			AddObjectToEditor(shelf.gameObject);
 
 			yield return "Adding columns...";
@@ -223,6 +223,34 @@ namespace NewPlusDecorations
 			clock.renderer = CreateBillboard("GrandFather_TickTock", grandFatherTextures[0], false, grandFatherClock.transform, Vector3.forward * 0.601f, Vector3.one * 0.9f, Vector3.zero);
 			CreateBillboard("GrandFather_Clock", grandFatherClockTexture, false, grandFatherClock.transform, new(0f, 4f, 1.01f), new(1f, 1f, 1f), Vector3.zero);
 
+			yield return "Adding wall shelves...";
+			renderers = new Renderer[3];
+			rendIdx = 0;
+			darkWood = Instantiate(man.Get<Texture2D>("woodTexture")).ApplyLightLevel(-15f);
+			darkWood.name = "Times_lessDarkWood";
+
+			shelf = new GameObject("WallShelf");
+			shelf.AddNavObstacle(new(9.5f, 2.5f, 4.5f));
+			shelf.AddBoxCollider(Vector3.up * 3f, Vector3.one * 6f, true);
+			AddObjectToEditor(shelf);
+
+			CreateCube("ShelfBody", darkWood, false, shelf.transform, Vector3.up * 3f, new(9, 0.7f, 4f)).SetBoxHitbox(y:2.5f);
+			CreateCubeWithRot("ShelfLeftConnection", blackTexture, false, shelf.transform, new(-3f, 1.49f, -1.64f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
+			CreateCubeWithRot("ShelfRightConnection", blackTexture, false, shelf.transform, new(3f, 1.49f, -1.64f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
+
+			yield return "Adding long office table...";
+
+			renderers = new Renderer[3];
+			rendIdx = 0;
+			shelf = new GameObject("LongOfficeTable");
+			shelf.AddNavObstacle(new(22f, 10f, 6.5f));
+			shelf.AddBoxCollider(Vector3.zero, new(21f, 10f, 6f), false);
+			AddObjectToEditor(shelf);
+
+			CreateCube("TableBody", closetTexture, false, shelf.transform, Vector3.zero, new(21f, 1f, 6f)).RemoveHitbox();
+			CreateCube("TableLongRightLeg", closetTexture, false, shelf.transform, new(10f, -2f, 0f), new(1f, 3f, 6f)).RemoveHitbox();
+			CreateCube("TableLongLeftLeg", closetTexture, false, shelf.transform, new(-10f, -2f, 0f), new(1f, 3f, 6f)).RemoveHitbox();
+
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
@@ -293,7 +321,7 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		const int loadSteps = 7;
+		const int loadSteps = 8;
 
 		void AddObjectToEditor(GameObject obj)
 		{
