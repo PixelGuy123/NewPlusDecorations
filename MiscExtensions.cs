@@ -1,6 +1,7 @@
 ﻿
 using UnityEngine.AI;
 using UnityEngine;
+using PixelInternalAPI.Classes;
 
 namespace NewPlusDecorations
 {
@@ -43,6 +44,12 @@ namespace NewPlusDecorations
 				y == -1 ? coll.size.y : y,
 				z == -1 ? coll.size.z : z
 				);
+			return obj;
+		}
+
+		internal static GameObject IgnoreRaycast(this GameObject obj)
+		{
+			obj.layer = LayerStorage.ignoreRaycast;
 			return obj;
 		}
 	}

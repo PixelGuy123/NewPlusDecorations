@@ -3,32 +3,32 @@ using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.Registers;
+using NewPlusDecorations.Components;
+using PixelInternalAPI.Classes;
+using PixelInternalAPI.Extensions;
 using PlusLevelLoader;
 using System.Collections;
-using UnityEngine;
-using PixelInternalAPI.Extensions;
-using PixelInternalAPI.Classes;
 using System.IO;
-using NewPlusDecorations.Components;
+using UnityEngine;
 
 namespace NewPlusDecorations
 {
-    [BepInPlugin("pixelguy.pixelmodding.baldiplus.newdecors", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+	[BepInPlugin("pixelguy.pixelmodding.baldiplus.newdecors", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
 	[BepInDependency("pixelguy.pixelmodding.baldiplus.pixelinternalapi", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)] // let's not forget this
 	[BepInDependency("mtm101.rulerp.baldiplus.levelloader", BepInDependency.DependencyFlags.HardDependency)]
 	[BepInDependency("mtm101.rulerp.baldiplus.leveleditor", BepInDependency.DependencyFlags.SoftDependency)]
 
 	public class DecorsPlugin : BaseUnityPlugin
-    {
-        private void Awake()
-        {
+	{
+		private void Awake()
+		{
 			path = AssetLoader.GetModPath(this);
 			var h = new Harmony("pixelguy.pixelmodding.baldiplus.newdecors");
 			h.PatchAllConditionals();
 
 			LoadingEvents.RegisterOnAssetsLoaded(Info, Load(), false);
-        }
+		}
 
 		IEnumerator Load()
 		{
@@ -110,9 +110,10 @@ namespace NewPlusDecorations
 				rendIdx = 0;
 
 
-				dirs.ForEach(dir => CreatePlane("PlaneDir_" + dir, whiteTex, column.transform, dir.ToVector3() * size.x, new(size.x * 0.2f, size.y * 0.1f, 1f), dir.GetOpposite().ToRotation().eulerAngles));
-				
+				dirs.ForEach(dir => CreatePlane("PlaneDir_" + dir, whiteTex, column.transform, dir.ToVector3() * size.x, new(size.x * 0.2f, size.y * 0.1f, 1f), dir.GetOpposite().ToRotation().eulerAngles).transform.GetChild(0).gameObject.RemoveHitbox());
+
 				column.AddContainer(renderers);
+				size.x *= 2f;
 				column.AddBoxCollider(Vector3.zero, new(size.x, size.y, size.x), false);
 				column.AddNavObstacle(new(size.x, size.y, size.x));
 
@@ -133,18 +134,15 @@ namespace NewPlusDecorations
 			renderers = new Renderer[6];
 			rendIdx = 0;
 
-			var closet = new GameObject("Closet")
-			{
-				layer = LayerStorage.ignoreRaycast
-			};
-			closet.AddBoxCollider(Vector3.zero, new(5f, 10f, 5f), true);
+			var closet = new GameObject("Closet") { layer = LayerStorage.ignoreRaycast };
+			closet.AddBoxCollider(Vector3.up * 5f, new(7.2f, 10f, 7.2f), true);
 			closet.AddNavObstacle(new(5f, 10f, 5f));
 			AddObjectToEditor(closet);
 			closet.AddComponent<EnvironmentObjectDistributor>();
 
 			CreateCube("ClosetBase", closetTexture, false, closet.transform, Vector3.down, new(5f, 1f, 5f));
-			CreateCube("ClosetRightSide", closetTexture, false, closet.transform, Vector3.right * 3f + Vector3.up * 2.5f, new(1f, 8f, 5f));
-			CreateCube("ClosetLeftSide", closetTexture, false, closet.transform, Vector3.left * 3f + Vector3.up * 2.5f, new(1f, 8f, 5f));
+			CreateCube("ClosetRightSide", closetTexture, false, closet.transform, (Vector3.right * 3f) + (Vector3.up * 2.5f), new(1f, 8f, 5f));
+			CreateCube("ClosetLeftSide", closetTexture, false, closet.transform, (Vector3.left * 3f) + (Vector3.up * 2.5f), new(1f, 8f, 5f));
 			CreateCube("ClosetTop", closetTexture, false, closet.transform, Vector3.up * 7f, new(7f, 1f, 5f)).GetComponent<BoxCollider>().size = new(1f, 3f, 1f);
 			CreateCube("ClosetBack", closetTexture, false, closet.transform, (Vector3.back + Vector3.up) * 3f, new(7f, 9f, 1f));
 
@@ -190,10 +188,10 @@ namespace NewPlusDecorations
 
 			var couchTexture = AssetLoader.TextureFromFile(Path.Combine(path, "couch.png")); //AssetLoader.TextureFromFile(Path.Combine(path, "couch.png"));
 			var couchTextBack = AssetLoader.TextureFromFile(Path.Combine(path, "couchBack.png"));
-			var sitCollider = CreateCube("CouchSit", couchTexture, false, couch.transform, Vector3.down * 4.2f, new(4.2f, 2f, 4.2f)).SetBoxHitbox(y:2f);
-			CreateCubeWithRot("CouchBack", couchTextBack, true, couch.transform, new(-2.5f, -3.4f, -2.5f), new(5f, 4.65f, 1f), Vector3.right * 345f).GetComponent<BoxCollider>().center = Vector3.right * 0.5f;
-			CreateCube("CouchSideRight", couchTexture, false, couch.transform, new(2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f);
-			CreateCube("CouchSideLeft", couchTexture, false, couch.transform, new(-2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f);
+			var sitCollider = CreateCube("CouchSit", couchTexture, false, couch.transform, Vector3.down * 4.2f, new(4.2f, 2f, 4.2f)).SetBoxHitbox(y: 2f).IgnoreRaycast();
+			CreateCubeWithRot("CouchBack", couchTextBack, true, couch.transform, new(-2.5f, -3.4f, -2.5f), new(5f, 4.65f, 1f), Vector3.right * 345f).IgnoreRaycast().GetComponent<BoxCollider>().center = Vector3.right * 0.5f;
+			CreateCube("CouchSideRight", couchTexture, false, couch.transform, new(2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
+			CreateCube("CouchSideLeft", couchTexture, false, couch.transform, new(-2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
 
 			yield return "Adding Grand Father Clock...";
 
@@ -230,9 +228,9 @@ namespace NewPlusDecorations
 			darkWood.name = "Times_lessDarkWood";
 
 			shelf = new GameObject("WallShelf")
-{
-layer = LayerStorage.ignoreRaycast
-};
+			{
+				layer = LayerStorage.ignoreRaycast
+			};
 			shelf.AddNavObstacle(new(9.5f, 2.5f, 4.5f));
 			shelf.AddBoxCollider(new(0f, 3f, -2.25f), new(9f, 0.8f, 4f), true);
 			AddObjectToEditor(shelf);
@@ -245,9 +243,12 @@ layer = LayerStorage.ignoreRaycast
 
 			renderers = new Renderer[3];
 			rendIdx = 0;
-			shelf = new GameObject("LongOfficeTable");
+			shelf = new GameObject("LongOfficeTable")
+			{
+				layer = LayerStorage.ignoreRaycast
+			};
 			shelf.AddNavObstacle(new(22f, 10f, 6.5f));
-			shelf.AddBoxCollider(Vector3.zero, new(21f, 10f, 6f), false);
+			shelf.AddBoxCollider(Vector3.zero, new(21f, 2f, 6f), false);
 			AddObjectToEditor(shelf);
 
 			CreateCube("TableBody", closetTexture, false, shelf.transform, Vector3.zero, new(21f, 1f, 6f)).RemoveHitbox();
@@ -289,7 +290,7 @@ layer = LayerStorage.ignoreRaycast
 
 			GameObject CreatePlane(string planeName, Texture2D spr, Transform parent, Vector3 offset, Vector3 scale, Vector3 rot)
 			{
-				var planeHolder = new GameObject(planeName );
+				var planeHolder = new GameObject(planeName);
 				planeHolder.transform.SetParent(parent);
 				planeHolder.transform.localPosition = offset;
 				planeHolder.transform.eulerAngles = rot;
@@ -339,5 +340,5 @@ layer = LayerStorage.ignoreRaycast
 		internal static AssetManager man = new();
 		public static T Get<T>(string name) =>
 			man.Get<T>(name);
-    }
+	}
 }
