@@ -229,12 +229,15 @@ namespace NewPlusDecorations
 			darkWood = Instantiate(man.Get<Texture2D>("woodTexture")).ApplyLightLevel(-15f);
 			darkWood.name = "Times_lessDarkWood";
 
-			shelf = new GameObject("WallShelf");
+			shelf = new GameObject("WallShelf")
+{
+layer = LayerStorage.ignoreRaycast
+};
 			shelf.AddNavObstacle(new(9.5f, 2.5f, 4.5f));
-			shelf.AddBoxCollider(new(0f, 3f, -2.25f), Vector3.one * 6f, true);
+			shelf.AddBoxCollider(new(0f, 3f, -2.25f), new(9f, 0.8f, 4f), true);
 			AddObjectToEditor(shelf);
 
-			CreateCube("ShelfBody", darkWood, false, shelf.transform, new(0f, 3f, -2.25f), new(9, 0.7f, 4f)).SetBoxHitbox(y:2.5f);
+			CreateCube("ShelfBody", darkWood, false, shelf.transform, new(0f, 3f, -2.25f), new(9, 0.7f, 4f));
 			CreateCubeWithRot("ShelfLeftConnection", blackTexture, false, shelf.transform, new(-3f, 1.49f, -3.4f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
 			CreateCubeWithRot("ShelfRightConnection", blackTexture, false, shelf.transform, new(3f, 1.49f, -3.4f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
 
