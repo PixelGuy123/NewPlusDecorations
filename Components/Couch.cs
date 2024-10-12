@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using PixelInternalAPI.Extensions;
+using System.Collections;
 using UnityEngine;
 
 namespace NewPlusDecorations.Components
@@ -17,6 +18,7 @@ namespace NewPlusDecorations.Components
 			camTarget.position = Singleton<CoreGameManager>.Instance.GetCamera(player).transform.position;
 			camTarget.rotation = Singleton<CoreGameManager>.Instance.GetCamera(player).transform.rotation;
 			Singleton<CoreGameManager>.Instance.GetCamera(player).UpdateTargets(camTarget, camVal);
+			Singleton<CoreGameManager>.Instance.GetPlayer(player).DisableClick(true);
 
 			StartCoroutine(PlayerInCouch(Singleton<CoreGameManager>.Instance.GetPlayer(player)));
 		}
@@ -153,6 +155,7 @@ namespace NewPlusDecorations.Components
 				pm.plm.Entity.SetFrozen(false);
 				Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).UpdateTargets(null, camVal);
 				Singleton<CoreGameManager>.Instance.GetCamera(pm.playerNumber).SetControllable(true);
+				pm.DisableClick(false);
 				pm.transform.eulerAngles = rotation;
 			}
 			beingUsed = false;
