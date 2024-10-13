@@ -193,6 +193,8 @@ namespace NewPlusDecorations
 			CreateCube("CouchSideRight", couchTexture, false, couch.transform, new(2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
 			CreateCube("CouchSideLeft", couchTexture, false, couch.transform, new(-2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
 
+			couch.AddContainer(renderers);
+
 			yield return "Adding Grand Father Clock...";
 
 			renderers = new Renderer[6];
@@ -221,6 +223,8 @@ namespace NewPlusDecorations
 			clock.renderer = CreateBillboard("GrandFather_TickTock", grandFatherTextures[0], false, grandFatherClock.transform, Vector3.forward * 0.601f, Vector3.one * 0.9f, Vector3.zero);
 			CreateBillboard("GrandFather_Clock", grandFatherClockTexture, false, grandFatherClock.transform, new(0f, 4f, 1.01f), new(1f, 1f, 1f), Vector3.zero);
 
+			grandFatherClock.AddContainer(renderers);
+
 			yield return "Adding wall shelves...";
 			renderers = new Renderer[3];
 			rendIdx = 0;
@@ -239,6 +243,8 @@ namespace NewPlusDecorations
 			CreateCubeWithRot("ShelfLeftConnection", blackTexture, false, shelf.transform, new(-3f, 1.49f, -3.4f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
 			CreateCubeWithRot("ShelfRightConnection", blackTexture, false, shelf.transform, new(3f, 1.49f, -3.4f), new(0.5f, 4f, 0.5f), Vector3.right * 45f).RemoveHitbox();
 
+			shelf.AddContainer(renderers);
+
 			yield return "Adding long office table...";
 
 			renderers = new Renderer[3];
@@ -254,6 +260,8 @@ namespace NewPlusDecorations
 			CreateCube("TableBody", closetTexture, false, shelf.transform, Vector3.zero, new(21f, 1f, 6f)).RemoveHitbox();
 			CreateCube("TableLongRightLeg", closetTexture, false, shelf.transform, new(10f, -2f, 0f), new(1f, 3f, 6f)).RemoveHitbox();
 			CreateCube("TableLongLeftLeg", closetTexture, false, shelf.transform, new(-10f, -2f, 0f), new(1f, 3f, 6f)).RemoveHitbox();
+
+			shelf.AddContainer(renderers);
 
 
 			yield return "Creating misc decorations...";
