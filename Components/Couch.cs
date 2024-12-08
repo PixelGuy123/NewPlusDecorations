@@ -29,6 +29,7 @@ namespace NewPlusDecorations.Components
 
 		IEnumerator PlayerInCouch(PlayerManager pm)
 		{
+
 			Vector3 tarPos = transform.position + transform.forward * 4.5f;
 			Vector3 rotation = Quaternion.LookRotation(tarPos - transform.position).eulerAngles;
 			pm.transform.eulerAngles = rotation;

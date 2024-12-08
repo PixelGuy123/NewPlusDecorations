@@ -2,6 +2,7 @@
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
+using MTM101BaldAPI.OBJImporter;
 using MTM101BaldAPI.Registers;
 using NewPlusDecorations.Components;
 using PixelInternalAPI.Classes;
@@ -146,11 +147,11 @@ namespace NewPlusDecorations
 			CreateCube("ClosetTop", closetTexture, false, closet.transform, Vector3.up * 7f, new(7f, 1f, 5f)).GetComponent<BoxCollider>().size = new(1f, 3f, 1f);
 			CreateCube("ClosetBack", closetTexture, false, closet.transform, (Vector3.back + Vector3.up) * 3f, new(7f, 9f, 1f));
 
-			var sprite = ObjectCreationExtensions.CreateSpriteBillboard(closetDoorTexture[0], false).AddSpriteHolder(0f, LayerStorage.iClickableLayer);
+			var spriteObj = ObjectCreationExtensions.CreateSpriteBillboard(closetDoorTexture[0], false).AddSpriteHolder(out var sprite, 0f, LayerStorage.iClickableLayer);
 			sprite.name = "ClosetDoorTex";
 			renderers[5] = sprite;
 
-			var door = sprite.transform.parent;
+			var door = spriteObj;
 			door.transform.SetParent(closet.transform);
 			door.name = "ClosetDoor";
 			door.transform.localScale = new(1f, 1.5f, 1f);
@@ -263,6 +264,13 @@ namespace NewPlusDecorations
 
 			shelf.AddContainer(renderers);
 
+			yield return "Loading the slide obj...";
+			var slide = LoadObjFile("Slide");
+			slide.name = "Slide";
+			AddObjectToEditor(slide);
+
+			slide.AddContainer(GetComponent<MeshRenderer>());
+
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
@@ -271,10 +279,10 @@ namespace NewPlusDecorations
 
 			void AddDecoration(string name, string fileName, float pixelsPerUnit, Vector3 offset)
 			{
-				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit)).AddSpriteHolder(offset);
-				bred.transform.parent.name = name;
+				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit)).AddSpriteHolder(out _, offset);
+				bred.transform.name = name;
 				bred.name = name;
-				AddObjectToEditor(bred.transform.parent.gameObject);
+				AddObjectToEditor(bred.transform.gameObject);
 				//"editorPrefab_"
 			}
 
@@ -327,13 +335,27 @@ namespace NewPlusDecorations
 				return planeHolder;
 			}
 
+			GameObject LoadObjFile(string objName) =>
+				new OBJLoader().Load(
+					Path.Combine(path, "objModels", objName, $"{objName}.obj"),
+					Path.Combine(path, "objModels", objName, $"{objName}.mtl"),
+					ObjectCreationExtension.defaultMaterial
+					);
+
+			GameObject LoadObjFile_CustomMaterial(string objName, Material mat) =>
+				new OBJLoader().Load(
+					Path.Combine(path, "objModels", objName, $"{objName}.obj"),
+					Path.Combine(path, "objModels", objName, $"{objName}.mtl"),
+					mat
+					);
+
 			yield return "Triggering post setup...";
 
 
 			PostSetup(man);
 		}
 
-		const int loadSteps = 8;
+		const int loadSteps = 9;
 
 		void AddObjectToEditor(GameObject obj)
 		{
