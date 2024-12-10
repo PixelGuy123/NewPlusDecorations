@@ -168,33 +168,43 @@ namespace NewPlusDecorations
 
 			closet.AddContainer(renderers);
 
-			yield return "Adding couch...";
+			yield return "Adding couches...";
 
-			renderers = new Renderer[4];
-			rendIdx = 0;
+			MakingCouch("couch.png", "couchBack.png", "Couch", true);
+			MakingCouch("redCouch.png", "redCouchBack.png", "RedCouch", false);
 
-			var couch = new GameObject("Couch")
+
+			void MakingCouch(string couchTextureName, string couchTextureBackName, string couchName, bool includesCouchComponent)
 			{
-				layer = LayerStorage.iClickableLayer
-			};
+				renderers = new Renderer[4];
+				rendIdx = 0;
 
-			couch.AddBoxCollider(Vector3.zero, new(4f, 10f, 4f), true);
-			couch.AddNavObstacle(new(4.5f, 10f, 4.5f));
+				var couch = new GameObject(couchName)
+				{
+					layer = LayerStorage.iClickableLayer
+				};
 
-			var couchComp = couch.AddComponent<Couch>();
-			couchComp.camTarget = new GameObject("CouchCam").transform;
-			couchComp.camTarget.transform.SetParent(couch.transform);
+				couch.AddBoxCollider(Vector3.zero, new(4f, 10f, 4f), true);
+				couch.AddNavObstacle(new(4.5f, 10f, 4.5f));
 
-			AddObjectToEditor(couch);
+				if (includesCouchComponent)
+				{
+					var couchComp = couch.AddComponent<Couch>();
+					couchComp.camTarget = new GameObject("CouchCam").transform;
+					couchComp.camTarget.transform.SetParent(couch.transform);
+				}
 
-			var couchTexture = AssetLoader.TextureFromFile(Path.Combine(path, "couch.png")); //AssetLoader.TextureFromFile(Path.Combine(path, "couch.png"));
-			var couchTextBack = AssetLoader.TextureFromFile(Path.Combine(path, "couchBack.png"));
-			var sitCollider = CreateCube("CouchSit", couchTexture, false, couch.transform, Vector3.down * 4.2f, new(4.2f, 2f, 4.2f)).SetBoxHitbox(y: 2f).IgnoreRaycast();
-			CreateCubeWithRot("CouchBack", couchTextBack, true, couch.transform, new(-2.5f, -3.4f, -2.5f), new(5f, 4.65f, 1f), Vector3.right * 345f).IgnoreRaycast().GetComponent<BoxCollider>().center = Vector3.right * 0.5f;
-			CreateCube("CouchSideRight", couchTexture, false, couch.transform, new(2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
-			CreateCube("CouchSideLeft", couchTexture, false, couch.transform, new(-2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
+				AddObjectToEditor(couch);
 
-			couch.AddContainer(renderers);
+				var couchTexture = AssetLoader.TextureFromFile(Path.Combine(path, couchTextureName)); //AssetLoader.TextureFromFile(Path.Combine(path, "couch.png"));
+				var couchTextBack = AssetLoader.TextureFromFile(Path.Combine(path, couchTextureBackName));
+				var sitCollider = CreateCube("CouchSit", couchTexture, false, couch.transform, Vector3.down * 4.2f, new(4.2f, 2f, 4.2f)).SetBoxHitbox(y: 2f).IgnoreRaycast();
+				CreateCubeWithRot("CouchBack", couchTextBack, true, couch.transform, new(-2.5f, -3.4f, -2.5f), new(5f, 4.65f, 1f), Vector3.right * 345f).IgnoreRaycast().GetComponent<BoxCollider>().center = Vector3.right * 0.5f;
+				CreateCube("CouchSideRight", couchTexture, false, couch.transform, new(2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
+				CreateCube("CouchSideLeft", couchTexture, false, couch.transform, new(-2.5f, -3.5f, -0.1f), new(1f, 3.7f, 4.5f)).SetBoxHitbox(y: 10f).IgnoreRaycast();
+
+				couch.AddContainer(renderers);
+			}
 
 			yield return "Adding Grand Father Clock...";
 
@@ -265,7 +275,7 @@ namespace NewPlusDecorations
 			shelf.AddContainer(renderers);
 
 			yield return "Loading the slide obj...";
-			var slide = LoadObjFile("Slide");
+			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), 27f);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
 
@@ -342,12 +352,30 @@ namespace NewPlusDecorations
 					ObjectCreationExtension.defaultMaterial
 					);
 
-			GameObject LoadObjFile_CustomMaterial(string objName, Material mat) =>
-				new OBJLoader().Load(
-					Path.Combine(path, "objModels", objName, $"{objName}.obj"),
-					Path.Combine(path, "objModels", objName, $"{objName}.mtl"),
-					mat
-					);
+			GameObject SetupObjCollisionAndScale(GameObject obj, float newScale)
+			{
+				obj.gameObject.AddBoxCollider(Vector3.zero, Vector3.one, true);
+				obj.transform.localScale = Vector3.one;
+
+				var childRef = new GameObject(obj.name + "_Renderer");
+				childRef.transform.SetParent(obj.transform);
+				childRef.transform.localPosition = -0.258f * newScale * Vector3.forward;
+
+				var childs = obj.transform.AllChilds();
+				childs.ForEach(c => 
+				{
+					if (c == childRef.transform)
+						return;
+					c.SetParent(childRef.transform);
+					c.transform.localPosition = Vector3.zero;
+					c.transform.localScale = Vector3.one * newScale;
+					c.gameObject.AddComponent<MeshCollider>();
+				});
+
+				
+
+				return obj;
+			}
 
 			yield return "Triggering post setup...";
 
