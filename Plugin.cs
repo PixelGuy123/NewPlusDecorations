@@ -9,6 +9,7 @@ using PixelInternalAPI.Classes;
 using PixelInternalAPI.Extensions;
 using PlusLevelLoader;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -275,12 +276,9 @@ namespace NewPlusDecorations
 			shelf.AddContainer(renderers);
 
 			yield return "Loading the slide obj...";
-			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), 27f);
+			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(7f, 10f, 2.5f), 27f, true);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
-
-			slide.AddContainer(GetComponent<MeshRenderer>());
-
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
@@ -352,35 +350,48 @@ namespace NewPlusDecorations
 					ObjectCreationExtension.defaultMaterial
 					);
 
-			GameObject SetupObjCollisionAndScale(GameObject obj, float newScale)
-			{
-				obj.gameObject.AddBoxCollider(Vector3.zero, Vector3.one, true);
-				obj.transform.localScale = Vector3.one;
-
-				var childRef = new GameObject(obj.name + "_Renderer");
-				childRef.transform.SetParent(obj.transform);
-				childRef.transform.localPosition = -0.258f * newScale * Vector3.forward;
-
-				var childs = obj.transform.AllChilds();
-				childs.ForEach(c => 
-				{
-					if (c == childRef.transform)
-						return;
-					c.SetParent(childRef.transform);
-					c.transform.localPosition = Vector3.zero;
-					c.transform.localScale = Vector3.one * newScale;
-					c.gameObject.AddComponent<MeshCollider>();
-				});
-
-				
-
-				return obj;
-			}
+			
 
 			yield return "Triggering post setup...";
 
 
 			PostSetup(man);
+		}
+
+		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer)
+		{
+			obj.gameObject.AddBoxCollider(Vector3.up * 2.5f, Vector3.one * 5f, true);
+			obj.transform.localScale = Vector3.one;
+			obj.gameObject.AddComponent<NoCollisionOnStart>();
+			obj.gameObject.AddNavObstacle(navMeshSize);
+
+			var childRef = new GameObject(obj.name + "_Renderer");
+			childRef.transform.SetParent(obj.transform);
+			childRef.transform.localPosition = -0.258f * newScale * Vector3.forward;
+
+			var childs = obj.transform.AllChilds();
+			childs.ForEach(c =>
+			{
+				if (c == childRef.transform)
+					return;
+				c.SetParent(childRef.transform);
+				c.transform.localPosition = Vector3.zero;
+				c.transform.localScale = Vector3.one * newScale;
+				c.gameObject.AddComponent<MeshCollider>();
+			});
+
+			if (automaticallyContainer)
+				obj.AddContainer(obj.GetComponentsInChildren<MeshRenderer>());
+
+
+			return obj;
+		}
+
+		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, out List<Renderer> renderers)
+		{
+			var ob = SetupObjCollisionAndScale(obj, navMeshSize, newScale, false);
+			renderers = [.. obj.GetComponentsInChildren<MeshRenderer>()];
+			return ob;
 		}
 
 		const int loadSteps = 9;
