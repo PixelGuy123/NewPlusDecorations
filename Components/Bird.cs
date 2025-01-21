@@ -196,7 +196,7 @@ namespace NewPlusDecorations.Components
 		internal CapsuleCollider collider;
 
 		[SerializeField]
-		internal float minIdleDelay = 0.25f, maxIdleDelay = 1.25f, flySpeed = 11f, maxFlyHeightToDespawn = 70f, flySpriteSpeed = 19f, timeOutside = 5f, groundHeight = 0f, eatDelay = 1.5f, minEatSpeed = 10f, maxEatSpeed = 45f,
+		internal float minIdleDelay = 0.25f, maxIdleDelay = 1.25f, flySpeed = 18f, maxFlyHeightToDespawn = 70f, flySpriteSpeed = 19f, timeOutside = 5f, groundHeight = 0f, eatDelay = 1.5f, minEatSpeed = 10f, maxEatSpeed = 45f,
 			landOffset = 2.25f;
 
 		[SerializeField]
