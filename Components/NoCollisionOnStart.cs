@@ -5,6 +5,9 @@ namespace NewPlusDecorations.Components
 	public class NoCollisionOnStart : MonoBehaviour
 	{
 		void Start() =>
-			Destroy(GetComponent<Collider>());
+			Destroy(toDestroy);
+
+		[SerializeField]
+		internal Collider toDestroy;
 	}
 }

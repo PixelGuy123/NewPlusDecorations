@@ -9,7 +9,6 @@ using PixelInternalAPI.Classes;
 using PixelInternalAPI.Extensions;
 using PlusLevelLoader;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -275,23 +274,127 @@ namespace NewPlusDecorations
 
 			shelf.AddContainer(renderers);
 
-			yield return "Loading the slide obj...";
-			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(7f, 10f, 2.5f), 27f, true);
+			yield return "Loading the Slide obj...";
+			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(15f, 10f, 4.5f), 0.25f);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
+
+			yield return "Loading the MonkeyBars obj...";
+			slide = SetupObjCollisionAndScale(LoadObjFile("monkeyBars"), new(15f, 10f, 4.5f), 0.25f);
+			slide.name = "Monkeybars";
+			AddObjectToEditor(slide);
+
+			yield return "Creating the pavement variants...";
+
+			CreatePavement("pavementCover", "lineStraight.png");
+			CreatePavement("pavementCorner", "lineStraight_corner.png");
+			CreatePavement("pavementOutCorner", "lineStraight_outCorner.png");
+			CreatePavement("pavementLcover", "lineStraight_Lcover.png");
+			CreatePavement("pavementRcover", "lineStraight_Rcover.png");
+
+			yield return "Creating the picnic sheet...";
+
+			CreatePavement("OutsidePicnicSheet", "picnic_texture.png", 13.5f);
+
+			void CreatePavement(string name, string fileName, float pixelsPerUnit = 12.8f)
+			{
+				var pavement = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromFile(Path.Combine(path, fileName), Vector2.one * 0.5f, pixelsPerUnit), false)
+				.AddSpriteHolder(out var pavementRenderer, 0.01f, 0);
+
+				pavementRenderer.name = name + "_Renderer";
+				pavementRenderer.gameObject.layer = 0;
+				pavementRenderer.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+
+				pavement.name = name;
+				AddObjectToEditor(pavement.gameObject);
+			}
+
+			yield return "Creating the Bush...";
+
+			var bush = AddDecoration("PlaygroundBush", "bush.png", 20f, Vector3.up * 3.5f, false);
+			bush.gameObject.AddBoxCollider(Vector3.up * 5f, new(3f, 5f, 3f), true);
+			bush.gameObject.layer = LayerStorage.iClickableLayer;
+
+			var bushObj = bush.gameObject.AddComponent<Bush>();
+			bushObj.audMan = bush.gameObject.CreatePropagatedAudioManager(45f, 70f);
+
+			bushObj.audEnter = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromFile(Path.Combine(path, "bushEnter.mp3")), string.Empty, SoundType.Effect, Color.white);
+			bushObj.audEnter.subtitle = false;
+
+			bushObj.audLeave = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromFile(Path.Combine(path, "bushLeave.mp3")), string.Empty, SoundType.Effect, Color.white);
+			bushObj.audLeave.subtitle = false;
+
+			bushObj.cameraTransform = new GameObject("CameraTransform").transform;
+			bushObj.cameraTransform.SetParent(bushObj.transform);
+			bushObj.cameraTransform.localPosition = Vector3.up * 4f;
+
+			bushObj.hud = ObjectCreationExtensions.CreateCanvas();
+			bushObj.hud.name = "BushCanvas";
+			bushObj.hud.transform.SetParent(bushObj.transform);
+			bushObj.hud.gameObject.SetActive(false);
+
+			ObjectCreationExtensions.CreateImage(bushObj.hud, AssetLoader.SpriteFromFile(Path.Combine(path, "bushInside.png"), Vector2.one * 0.5f));
+
+			yield return "Creating birds...";
+
+			const float birdPixsUnit = 10f;
+			var birdWingSound = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromFile(Path.Combine(path, "birdFlapWing.wav")), string.Empty, SoundType.Effect, Color.white);
+			CreateBird(TextureExtensions.LoadSpriteSheet(8, 1, birdPixsUnit, path, "greenBird.png"), "GreenBird");
+			CreateBird(TextureExtensions.LoadSpriteSheet(8, 1, birdPixsUnit, path, "orangeBird.png"), "OrangeBird");
+			CreateBird(TextureExtensions.LoadSpriteSheet(8, 1, birdPixsUnit, path, "purpleBird.png"), "PurpleBird");
+
+			void CreateBird(Sprite[] sprs, string name)
+			{
+				var birdObj = ObjectCreationExtensions.CreateSpriteBillboard(sprs[0]).AddSpriteHolder(out var birdRenderer, 2.35f, LayerStorage.ignoreRaycast);
+				birdObj.name = name;
+				birdRenderer.name = name + "_Renderer";
+
+				var bird = birdObj.gameObject.AddComponent<Bird>();
+				bird.renderer = birdRenderer;
+
+				bird.collider = birdObj.gameObject.AddComponent<CapsuleCollider>();
+				bird.collider.isTrigger = true;
+				bird.collider.height = 1f;
+				bird.collider.radius = 35f;
+
+				AddObjectToEditor(birdObj.gameObject);
+
+				bird.audMan = bird.gameObject.CreatePropagatedAudioManager(55f, 125f);
+				bird.audFlyAway = birdWingSound;
+				bird.audFlyAway.subtitle = false;
+				bird.sprIdle = sprs.Take(2);
+				bird.sprFloorEat = sprs.Skip(2).Take(2);
+				bird.sprFlyingAway = [sprs[4], sprs[5]];
+				bird.rotator = birdRenderer.CreateAnimatedSpriteRotator(
+					GenericExtensions.CreateRotationMap(2, sprs[4], sprs[6]),
+					GenericExtensions.CreateRotationMap(2, sprs[5], sprs[7])
+					);
+			}
+
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
 			AddDecoration("SmallPottedPlant", "plant.png", 25f, Vector3.up);
 			AddDecoration("TableLightLamp", "tablelamp.png", 25f, Vector3.up * 0.7f);
+			AddDecoration("BaldiPlush", "baldiPlush.png", 35f, Vector3.zero);
+			AddDecoration("FancyOfficeLamp", "veryLikeOfficeLamp.png", 29f, Vector3.zero);
+			AddDecoration("SaltAndHot", "saltObjects.png", 26f, Vector3.zero);
+			AddDecoration("TheRulesBook", "TheRulesBook.png", 25f, Vector3.zero);
 
-			void AddDecoration(string name, string fileName, float pixelsPerUnit, Vector3 offset)
+			RendererContainer AddDecoration(string name, string fileName, float pixelsPerUnit, Vector3 offset, bool hasFakeCollider = true)
 			{
-				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit)).AddSpriteHolder(out _, offset);
-				bred.transform.name = name;
+				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit)).AddSpriteHolder(out var bredRend, offset);
+				bredRend.name = name + "_Renderer";
 				bred.name = name;
-				AddObjectToEditor(bred.transform.gameObject);
+				AddObjectToEditor(bred.gameObject);
+				if (!hasFakeCollider)
+				{
+					var start = bred.GetComponent<NoCollisionOnStart>();
+					Destroy(start.toDestroy);
+					Destroy(start);
+				}
 				//"editorPrefab_"
+				return bred;
 			}
 
 			GameObject CreateCube(string cubeName, Texture2D texture, bool useUV, Transform parent, Vector3 offset, Vector3 scale)
@@ -350,7 +453,7 @@ namespace NewPlusDecorations
 					ObjectCreationExtension.defaultMaterial
 					);
 
-			
+
 
 			yield return "Triggering post setup...";
 
@@ -358,16 +461,17 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer)
+		const int loadSteps = 14;
+
+		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{
-			obj.gameObject.AddBoxCollider(Vector3.up * 2.5f, Vector3.one * 5f, true);
 			obj.transform.localScale = Vector3.one;
-			obj.gameObject.AddComponent<NoCollisionOnStart>();
-			obj.gameObject.AddNavObstacle(navMeshSize);
+			if (navMeshSize != default)
+				obj.gameObject.AddNavObstacle(navMeshSize);
 
 			var childRef = new GameObject(obj.name + "_Renderer");
 			childRef.transform.SetParent(obj.transform);
-			childRef.transform.localPosition = -0.258f * newScale * Vector3.forward;
+			childRef.transform.localPosition = Vector3.zero;
 
 			var childs = obj.transform.AllChilds();
 			childs.ForEach(c =>
@@ -377,7 +481,8 @@ namespace NewPlusDecorations
 				c.SetParent(childRef.transform);
 				c.transform.localPosition = Vector3.zero;
 				c.transform.localScale = Vector3.one * newScale;
-				c.gameObject.AddComponent<MeshCollider>();
+				if (addMeshCollider)
+					c.gameObject.AddComponent<MeshCollider>();
 			});
 
 			if (automaticallyContainer)
@@ -387,20 +492,18 @@ namespace NewPlusDecorations
 			return obj;
 		}
 
-		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, out List<Renderer> renderers)
-		{
-			var ob = SetupObjCollisionAndScale(obj, navMeshSize, newScale, false);
-			renderers = [.. obj.GetComponentsInChildren<MeshRenderer>()];
-			return ob;
-		}
-
-		const int loadSteps = 9;
-
 		void AddObjectToEditor(GameObject obj)
 		{
 			PlusLevelLoaderPlugin.Instance.prefabAliases.Add(obj.name, obj);
 			man.Add($"editorPrefab_{obj.name}", obj);
 			obj.ConvertToPrefab(true);
+
+			if (!obj.GetComponent<Collider>())
+			{
+				var col = obj.AddComponent<BoxCollider>();
+				col.size = new(2.5f, 5f, 2.5f); // Placeholder collider for the editor
+				obj.AddComponent<NoCollisionOnStart>().toDestroy = col;
+			}
 		}
 
 		static void PostSetup(AssetManager man) { }
@@ -409,5 +512,26 @@ namespace NewPlusDecorations
 		internal static AssetManager man = new();
 		public static T Get<T>(string name) =>
 			man.Get<T>(name);
+	}
+
+	static class ArrayExtensions
+	{
+		public static T[] Skip<T>(this T[] ar, int count)
+		{
+			var newAr = new T[ar.Length - count];
+			int index = count;
+			for (int z = 0; z < newAr.Length; z++)
+				newAr[z] = ar[index++];
+			return newAr;
+		}
+		public static T[] Take<T>(this T[] ar, int count) =>
+			ar.Take(0, count);
+		public static T[] Take<T>(this T[] ar, int index, int count)
+		{
+			var newAr = new T[count];
+			for (int z = 0; z < count; z++)
+				newAr[z] = ar[index++];
+			return newAr;
+		}
 	}
 }

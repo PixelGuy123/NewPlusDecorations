@@ -32,11 +32,27 @@ namespace NewPlusDecorations.Patches
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_GrandFatherClock"), Vector3.up * 3.5f);
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_WallShelf"), Vector3.up);
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_LongOfficeTable"), Vector3.up * 3.5f);
-			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Slide"), Vector3.up * 3.5f);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Slide"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Monkeybars"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_OutsidePicnicSheet"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_pavementCover"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_pavementCorner"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_pavementOutCorner"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_pavementLcover"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_pavementRcover"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_PlaygroundBush"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_GreenBird"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_OrangeBird"), Vector3.zero);
+			MarkObject(man.Get<GameObject>("editorPrefab_PurpleBird"), Vector3.zero);
+
 
 			// Decorations
 			MarkObject(man.Get<GameObject>("editorPrefab_SmallPottedPlant"), Vector3.up * 5f);
 			MarkObject(man.Get<GameObject>("editorPrefab_TableLightLamp"), Vector3.up * 5f);
+			MarkObject(man.Get<GameObject>("editorPrefab_BaldiPlush"), Vector3.up * 5f);
+			MarkObject(man.Get<GameObject>("editorPrefab_FancyOfficeLamp"), Vector3.up * 5f);
+			MarkObject(man.Get<GameObject>("editorPrefab_SaltAndHot"), Vector3.up * 4f);
+			MarkObject(man.Get<GameObject>("editorPrefab_TheRulesBook"), Vector3.up * 5f);
 
 			// Columns
 			MarkObject(man.Get<GameObject>("editorPrefab_BigColumn"), Vector3.up * 5f);
