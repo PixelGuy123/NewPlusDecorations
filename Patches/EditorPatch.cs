@@ -34,6 +34,8 @@ namespace NewPlusDecorations.Patches
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_LongOfficeTable"), Vector3.up * 3.5f);
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Slide"), Vector3.zero);
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Monkeybars"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Seesaw"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_Swingset"), Vector3.zero);
 			MarkObject(man.Get<GameObject>("editorPrefab_OutsidePicnicSheet"), Vector3.zero);
 			MarkObject(man.Get<GameObject>("editorPrefab_pavementCover"), Vector3.zero);
 			MarkRotatingObject(man.Get<GameObject>("editorPrefab_pavementCorner"), Vector3.zero);

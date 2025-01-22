@@ -10,6 +10,7 @@ namespace NewPlusDecorations.Components
 #pragma warning disable IDE0051 // Remover membros privados não utilizados
 		void Start()
 		{
+			ogPos = transform.position;
 			roomControl = ec.CellFromPosition(transform.position).room;
 			StartCoroutine(Fly(true));
 		}
@@ -83,7 +84,8 @@ namespace NewPlusDecorations.Components
 			rotator.BypassRotation(false);
 			float frame = 0f;
 
-			audMan.PlaySingle(audFlyAway);
+			if (!spawn)
+				audMan.PlaySingle(audFlyAway);
 			Vector3 pos = transform.position;
 
 			while (true) // Flying away
@@ -129,8 +131,13 @@ namespace NewPlusDecorations.Components
 			}
 			renderer.enabled = true;
 
-			target = roomControl.RandomEventSafeCellNoGarbage();
-			targetPos = target.FloorWorldPosition + new Vector3(Random.Range(-landOffset, landOffset), 0f, Random.Range(-landOffset, landOffset));
+			bool goToOgPos = Random.value <= chanceToGoToOgSpot;
+			float groundHeight = goToOgPos ?
+				ogPos.y : this.groundHeight;
+
+			target = goToOgPos ? ec.CellFromPosition(ogPos) : roomControl.RandomEventSafeCellNoGarbage();
+			targetPos = goToOgPos ? target.FloorWorldPosition : 
+				target.FloorWorldPosition + new Vector3(Random.Range(-landOffset, landOffset), 0f, Random.Range(-landOffset, landOffset));
 
 			var startCell = roomControl.TileAtIndex(Random.Range(0, roomControl.TileCount));
 			pos = startCell.FloorWorldPosition + Vector3.up * maxFlyHeightToDespawn;
@@ -151,7 +158,7 @@ namespace NewPlusDecorations.Components
 
 				Vector3 dir = (positionToGo - pos.ZeroOutY()).normalized;
 				transform.rotation = Quaternion.LookRotation(dir);
-				pos += dir * flySpeed * ec.EnvironmentTimeScale * Time.deltaTime;
+				pos += dir * flySpeed * ec.EnvironmentTimeScale * Time.deltaTime * (pos.y - groundHeight < 7.5f && goToOgPos ? 10f : 1f);
 
 				if (hasPath && ec.CellFromPosition(pos) == pathToFollow[0])
 					pathToFollow.RemoveAt(0);
@@ -196,17 +203,18 @@ namespace NewPlusDecorations.Components
 		internal CapsuleCollider collider;
 
 		[SerializeField]
-		internal float minIdleDelay = 0.25f, maxIdleDelay = 1.25f, flySpeed = 18f, maxFlyHeightToDespawn = 70f, flySpriteSpeed = 19f, timeOutside = 5f, groundHeight = 0f, eatDelay = 1.5f, minEatSpeed = 10f, maxEatSpeed = 45f,
+		internal float minIdleDelay = 0.25f, maxIdleDelay = 1.25f, flySpeed = 18f, maxFlyHeightToDespawn = 70f, flySpriteSpeed = 19f, timeOutside = 8.5f, groundHeight = 0f, eatDelay = 1.5f, minEatSpeed = 10f, maxEatSpeed = 45f,
 			landOffset = 2.25f;
 
 		[SerializeField]
 		[Range(0f, 1f)]
-		internal float eatSomethingChance = 0.15f;
+		internal float eatSomethingChance = 0.15f, chanceToGoToOgSpot = 0.12f;
 
 		Coroutine idleCor, flyCor;
 		bool isIdle = false;
 		RoomController roomControl;
 		readonly List<Cell> pathToFollow = [];
+		Vector3 ogPos;
 
 		Ray ray = new();
 		RaycastHit hit;

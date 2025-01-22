@@ -284,6 +284,16 @@ namespace NewPlusDecorations
 			slide.name = "Monkeybars";
 			AddObjectToEditor(slide);
 
+			yield return "Loading the Seesaw obj...";
+			slide = SetupObjCollisionAndScale(LoadObjFile("Seesaw"), new(15.85f, 10f, 4.5f), 0.35f);
+			slide.name = "Seesaw";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the Swingset obj...";
+			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f);
+			slide.name = "Swingset";
+			AddObjectToEditor(slide);
+
 			yield return "Creating the pavement variants...";
 
 			CreatePavement("pavementCover", "lineStraight.png");
@@ -461,7 +471,7 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		const int loadSteps = 14;
+		const int loadSteps = 16;
 
 		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{
