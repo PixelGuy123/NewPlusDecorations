@@ -208,7 +208,7 @@ namespace NewPlusDecorations.Components
 
 		[SerializeField]
 		[Range(0f, 1f)]
-		internal float eatSomethingChance = 0.15f, chanceToGoToOgSpot = 0.12f;
+		internal float eatSomethingChance = 0.15f, chanceToGoToOgSpot = 0.45f;
 
 		Coroutine idleCor, flyCor;
 		bool isIdle = false;
