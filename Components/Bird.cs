@@ -131,7 +131,7 @@ namespace NewPlusDecorations.Components
 			}
 			renderer.enabled = true;
 
-			bool goToOgPos = Random.value <= chanceToGoToOgSpot;
+			bool goToOgPos = ogPos.y != this.groundHeight && Random.value <= chanceToGoToOgSpot;
 			float groundHeight = goToOgPos ?
 				ogPos.y : this.groundHeight;
 
