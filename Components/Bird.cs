@@ -158,7 +158,7 @@ namespace NewPlusDecorations.Components
 
 				Vector3 dir = (positionToGo - pos.ZeroOutY()).normalized;
 				transform.rotation = Quaternion.LookRotation(dir);
-				pos += dir * flySpeed * ec.EnvironmentTimeScale * Time.deltaTime * (pos.y - groundHeight < 7.5f && goToOgPos ? 10f : 1f);
+				pos += dir * flySpeed * ec.EnvironmentTimeScale * Time.deltaTime * (pos.y - groundHeight < 7.5f && goToOgPos ? Mathf.Max(1f, Vector3.Distance(pos, ogPos)) : 1f);
 
 				if (hasPath && ec.CellFromPosition(pos) == pathToFollow[0])
 					pathToFollow.RemoveAt(0);
