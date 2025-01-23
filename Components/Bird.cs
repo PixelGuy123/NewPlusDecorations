@@ -8,8 +8,9 @@ namespace NewPlusDecorations.Components
 	public class Bird : EnvironmentObject
 	{
 #pragma warning disable IDE0051 // Remover membros privados não utilizados
-		void Start()
+		public override void LoadingFinished()
 		{
+			base.LoadingFinished();
 			ogPos = transform.position;
 			roomControl = ec.CellFromPosition(transform.position).room;
 			StartCoroutine(Fly(true));
