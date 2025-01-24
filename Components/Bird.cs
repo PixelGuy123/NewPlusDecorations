@@ -15,27 +15,18 @@ namespace NewPlusDecorations.Components
 			roomControl = ec.CellFromPosition(transform.position).room;
 			StartCoroutine(Fly(true));
 		}
-
-
-		void OnTriggerStay(Collider other)
 #pragma warning restore IDE0051 // Remover membros privados não utilizados
-		{
-			if (isIdle && other.GetComponent<Entity>())
-			{
-				ray.origin = transform.position;
-				ray.direction = other.transform.position - transform.position;
-				if (Physics.Raycast(ray, out hit, 999f) && hit.transform == other.transform)
-				{
-					isIdle = false;
-					if (idleCor != null)
-						StopCoroutine(idleCor);
-					collider.enabled = false;
 
-					if (flyCor != null)
-						StopCoroutine(flyCor);
-					flyCor = StartCoroutine(Fly(false));
-				}
-			}
+		public void FlyAway()
+		{
+			isIdle = false;
+			if (idleCor != null)
+				StopCoroutine(idleCor);
+			collider.enabled = false;
+
+			if (flyCor != null)
+				StopCoroutine(flyCor);
+			flyCor = StartCoroutine(Fly(false));
 		}
 
 		IEnumerator Idle()
@@ -171,7 +162,12 @@ namespace NewPlusDecorations.Components
 				{
 					pathToFollow.Clear();
 
-					pos.y = groundHeight;
+					
+					if (goToOgPos)
+						pos = ogPos;
+					else
+						pos.y = groundHeight;
+
 					transform.position = pos;
 
 					idleCor = StartCoroutine(Idle());
@@ -213,9 +209,27 @@ namespace NewPlusDecorations.Components
 
 		Coroutine idleCor, flyCor;
 		bool isIdle = false;
+		public bool IsIdle => isIdle;
 		RoomController roomControl;
 		readonly List<Cell> pathToFollow = [];
 		Vector3 ogPos;
+	}
+
+	class BirdTrigger : MonoBehaviour
+	{
+		[SerializeField]
+		internal Bird bird;
+		void OnTriggerStay(Collider other)
+
+		{
+			if (bird.IsIdle && other.GetComponent<Entity>())
+			{
+				ray.origin = transform.position;
+				ray.direction = other.transform.position - transform.position;
+				if (Physics.Raycast(ray, out hit, 999f) && hit.transform == other.transform)
+					bird.FlyAway();
+			}
+		}
 
 		Ray ray = new();
 		RaycastHit hit;

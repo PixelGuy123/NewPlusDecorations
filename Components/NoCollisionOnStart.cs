@@ -4,8 +4,10 @@ namespace NewPlusDecorations.Components
 {
 	public class NoCollisionOnStart : MonoBehaviour
 	{
-		void Start() =>
+		void Start()
+		{
 			Destroy(toDestroy);
+		}
 
 		[SerializeField]
 		internal Collider toDestroy;

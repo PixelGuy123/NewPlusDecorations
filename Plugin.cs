@@ -11,6 +11,7 @@ using PlusLevelLoader;
 using System.Collections;
 using System.IO;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace NewPlusDecorations
 {
@@ -275,22 +276,34 @@ namespace NewPlusDecorations
 			shelf.AddContainer(renderers);
 
 			yield return "Loading the Slide obj...";
-			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(15f, 10f, 4.5f), 0.25f);
+			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(15f, 10f, 4.5f), 0.25f, addMeshCollider: false);
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the MonkeyBars obj...";
-			slide = SetupObjCollisionAndScale(LoadObjFile("monkeyBars"), new(15f, 10f, 4.5f), 0.25f);
+			slide = SetupObjCollisionAndScale(LoadObjFile("monkeyBars"), default, 0.25f, addMeshCollider: false);
+
+			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(2.5f, 5f, 1.5f), new(4.5f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.right * 4.5f);
+			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(2.5f, 5f, 1.5f), new(-4.5f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.left * 4.5f);
+
 			slide.name = "Monkeybars";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the Seesaw obj...";
-			slide = SetupObjCollisionAndScale(LoadObjFile("Seesaw"), new(15.85f, 10f, 4.5f), 0.35f);
+			slide = SetupObjCollisionAndScale(LoadObjFile("Seesaw"), new(15.85f, 10f, 4.5f), 0.35f, addMeshCollider: false);
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
 			slide.name = "Seesaw";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the Swingset obj...";
-			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f);
+			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f, addMeshCollider: false);
+
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(8.85f, 5f, 5f), false);
+
 			slide.name = "Swingset";
 			AddObjectToEditor(slide);
 
@@ -355,17 +368,27 @@ namespace NewPlusDecorations
 
 			void CreateBird(Sprite[] sprs, string name)
 			{
-				var birdObj = ObjectCreationExtensions.CreateSpriteBillboard(sprs[0]).AddSpriteHolder(out var birdRenderer, 2.35f, LayerStorage.ignoreRaycast);
+				var birdObj = ObjectCreationExtensions.CreateSpriteBillboard(sprs[0]).AddSpriteHolder(out var birdRenderer, 2.35f);
 				birdObj.name = name;
 				birdRenderer.name = name + "_Renderer";
 
 				var bird = birdObj.gameObject.AddComponent<Bird>();
 				bird.renderer = birdRenderer;
 
-				bird.collider = birdObj.gameObject.AddComponent<CapsuleCollider>();
+				var birdTrigger = new GameObject(name + "_Trigger")
+				{
+					layer = LayerStorage.ignoreRaycast
+				};
+
+				birdTrigger.transform.SetParent(birdObj.transform);
+				birdTrigger.transform.localPosition = Vector3.zero;
+
+				bird.collider = birdTrigger.gameObject.AddComponent<CapsuleCollider>();
 				bird.collider.isTrigger = true;
 				bird.collider.height = 1f;
 				bird.collider.radius = 35f;
+
+				birdTrigger.gameObject.AddComponent<BirdTrigger>().bird = bird;
 
 				AddObjectToEditor(birdObj.gameObject);
 
@@ -500,6 +523,20 @@ namespace NewPlusDecorations
 
 
 			return obj;
+		}
+
+		void AddAdditionalCollider(Transform owner, LayerMask layer, Vector3 size, Vector3 center, Vector3 navMeshSize, Vector3 navMeshCenter)
+		{
+			var collider = new GameObject("Collider")
+			{ 
+				layer = layer
+			};
+
+			collider.transform.SetParent(owner);
+			collider.transform.localPosition = Vector3.zero;
+
+			collider.gameObject.AddBoxCollider(center, size, false);
+			collider.gameObject.AddNavObstacle(center, size);
 		}
 
 		void AddObjectToEditor(GameObject obj)
