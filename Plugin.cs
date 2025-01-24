@@ -307,6 +307,24 @@ namespace NewPlusDecorations
 			slide.name = "Swingset";
 			AddObjectToEditor(slide);
 
+			yield return "Loading the Metal Chair obj...";
+			slide = SetupObjCollisionAndScale(LoadObjFile("MetalChair"), new(2f, 10f, 2f), 1f, addMeshCollider: false);
+
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(1.75f, 5f, 1.75f), false);
+
+			slide.name = "MetalChair";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the Metal Desk obj...";
+			slide = SetupObjCollisionAndScale(LoadObjFile("MetalDesk"), new(12f, 10f, 4.5f), 1f, addMeshCollider: false);
+
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(11f, 5f, 4f), false);
+
+			slide.name = "MetalDesk";
+			AddObjectToEditor(slide);
+
 			yield return "Creating the pavement variants...";
 
 			CreatePavement("pavementCover", "lineStraight.png");
@@ -494,7 +512,7 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		const int loadSteps = 16;
+		const int loadSteps = 18;
 
 		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{

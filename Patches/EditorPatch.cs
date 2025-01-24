@@ -46,6 +46,42 @@ namespace NewPlusDecorations.Patches
 			MarkObject(man.Get<GameObject>("editorPrefab_GreenBird"), Vector3.zero);
 			MarkObject(man.Get<GameObject>("editorPrefab_OrangeBird"), Vector3.zero);
 			MarkObject(man.Get<GameObject>("editorPrefab_PurpleBird"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_MetalChair"), Vector3.zero);
+			MarkRotatingObject(man.Get<GameObject>("editorPrefab_MetalDesk"), Vector3.zero);
+			MarkObjectRow("oneMetalDeskSit", 
+				new() 
+				{
+				Item1 = man.Get<GameObject>("editorPrefab_MetalDesk"),
+				Item2 = Vector3.zero,
+				Item3 = Quaternion.identity
+				},
+				new()
+				{
+					Item1 = man.Get<GameObject>("editorPrefab_MetalChair"),
+					Item2 = Vector3.back * 3.5f,
+					Item3 = Quaternion.identity
+				}
+				);
+			MarkObjectRow("twoMetalDeskSit",
+				new()
+				{
+					Item1 = man.Get<GameObject>("editorPrefab_MetalDesk"),
+					Item2 = Vector3.zero,
+					Item3 = Quaternion.identity
+				},
+				new()
+				{
+					Item1 = man.Get<GameObject>("editorPrefab_MetalChair"),
+					Item2 = Vector3.back * 3.5f + Vector3.right * 3.5f,
+					Item3 = Quaternion.identity
+				},
+				new()
+				{
+					Item1 = man.Get<GameObject>("editorPrefab_MetalChair"),
+					Item2 = Vector3.back * 3.5f + Vector3.left * 3.5f,
+					Item3 = Quaternion.identity
+				}
+				);
 
 
 			// Decorations
