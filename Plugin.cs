@@ -278,15 +278,15 @@ namespace NewPlusDecorations
 			yield return "Loading the Slide obj...";
 			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(15f, 10f, 4.5f), 0.25f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 5.55f), false);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the MonkeyBars obj...";
 			slide = SetupObjCollisionAndScale(LoadObjFile("monkeyBars"), default, 0.25f, addMeshCollider: false);
 
-			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(2.5f, 5f, 1.5f), new(4.5f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.right * 4.5f);
-			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(2.5f, 5f, 1.5f), new(-4.5f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.left * 4.5f);
+			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(1f, 5f, 1.5f), new(4.5f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.right * 4.5f);
+			AddAdditionalCollider(slide.transform, LayerStorage.ignoreRaycast, new(1f, 5f, 1.5f), new(-4.25f, 5f, 0f), new(3.85f, 10f, 2.5f), Vector3.left * 4.5f);
 
 			slide.name = "Monkeybars";
 			AddObjectToEditor(slide);
@@ -536,7 +536,7 @@ namespace NewPlusDecorations
 			collider.transform.localPosition = Vector3.zero;
 
 			collider.gameObject.AddBoxCollider(center, size, false);
-			collider.gameObject.AddNavObstacle(center, size);
+			collider.gameObject.AddNavObstacle(navMeshCenter, navMeshSize);
 		}
 
 		void AddObjectToEditor(GameObject obj)
