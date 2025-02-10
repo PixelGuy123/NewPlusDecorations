@@ -97,6 +97,10 @@ namespace NewPlusDecorations.Patches
 			MarkObject(man.Get<GameObject>("editorPrefab_MediumColumn"), Vector3.up * 5f);
 			MarkObject(man.Get<GameObject>("editorPrefab_SmallColumn"), Vector3.up * 5f);
 			MarkObject(man.Get<GameObject>("editorPrefab_ThinColumn"), Vector3.up * 5f);
+
+			string[] files = Directory.GetFiles(Path.Combine(DecorsPlugin.path, "EditorUI"));
+			for (int i = 0; i < files.Length; i++)
+				BaldiLevelEditorPlugin.Instance.assetMan.Add("UI/" + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), 40f));
 		}
 
 		static void MarkRotatingObject(GameObject obj, Vector3 offset, bool useActual = false)
@@ -130,9 +134,6 @@ namespace NewPlusDecorations.Patches
 		[HarmonyPostfix]
 		static void InitializeStuff(PlusLevelEditor __instance)
 		{
-			string[] files = Directory.GetFiles(Path.Combine(DecorsPlugin.path, "EditorUI"));
-			for (int i = 0; i < files.Length; i++)
-				BaldiLevelEditorPlugin.Instance.assetMan.Add("UI/" + Path.GetFileNameWithoutExtension(files[i]), AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(files[i]), 40f));
 
 			var objectCats = __instance.toolCats.Find(x => x.name == "objects").tools;
 
