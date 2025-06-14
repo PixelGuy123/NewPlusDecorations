@@ -12,7 +12,7 @@ namespace NewPlusDecorations.Components
 
 			isHidingPlayer = true;
 
-			Singleton<CoreGameManager>.Instance.GetPlayer(player).SetInvisible(true);
+			Singleton<CoreGameManager>.Instance.GetPlayer(player).plm.Entity.SetHidden(true);
 			Singleton<CoreGameManager>.Instance.GetPlayer(player).plm.Entity.SetFrozen(true);
 			Singleton<CoreGameManager>.Instance.GetCamera(player).SetControllable(false);
 			Singleton<CoreGameManager>.Instance.GetCamera(player).UpdateTargets(cameraTransform, 20);
@@ -52,7 +52,7 @@ namespace NewPlusDecorations.Components
 
 				if (!Singleton<CoreGameManager>.Instance.Paused && (Singleton<InputManager>.Instance.GetDigitalInput("Interact", true) || player.transform.position != pos))
 				{
-					player.SetInvisible(false);
+					player.SetHidden(false);
 					player.plm.Entity.SetFrozen(false);
 					break;
 				}
@@ -60,7 +60,7 @@ namespace NewPlusDecorations.Components
 					hud.gameObject.SetActive(false);
 				else
 					hud.gameObject.SetActive(true);
-				
+
 				yield return null;
 			}
 

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net46</TargetFramework>
     <AssemblyName>NewPlusDecorations</AssemblyName>
-    <Description>My first plugin</Description>
+    <Description>Adds new decorations to BB+</Description>
     <Version>1.1.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>

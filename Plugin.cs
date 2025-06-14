@@ -1,4 +1,6 @@
-﻿using BepInEx;
+﻿using System.Collections;
+using System.IO;
+using BepInEx;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
@@ -8,10 +10,7 @@ using NewPlusDecorations.Components;
 using PixelInternalAPI.Classes;
 using PixelInternalAPI.Extensions;
 using PlusLevelLoader;
-using System.Collections;
-using System.IO;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace NewPlusDecorations
 {
@@ -546,7 +545,7 @@ namespace NewPlusDecorations
 		void AddAdditionalCollider(Transform owner, LayerMask layer, Vector3 size, Vector3 center, Vector3 navMeshSize, Vector3 navMeshCenter)
 		{
 			var collider = new GameObject("Collider")
-			{ 
+			{
 				layer = layer
 			};
 
