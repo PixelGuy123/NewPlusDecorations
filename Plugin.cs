@@ -1,39 +1,51 @@
 ﻿using System.Collections;
 using System.IO;
 using BepInEx;
+using BepInEx.Bootstrap;
 using HarmonyLib;
 using MTM101BaldAPI;
 using MTM101BaldAPI.AssetTools;
 using MTM101BaldAPI.OBJImporter;
 using MTM101BaldAPI.Registers;
 using NewPlusDecorations.Components;
+using NewPlusDecorations.Patches;
 using PixelInternalAPI.Classes;
 using PixelInternalAPI.Extensions;
-using PlusLevelLoader;
+using PlusStudioLevelLoader;
 using UnityEngine;
 
 namespace NewPlusDecorations
 {
-	[BepInPlugin("pixelguy.pixelmodding.baldiplus.newdecors", PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-	[BepInDependency("pixelguy.pixelmodding.baldiplus.pixelinternalapi", BepInDependency.DependencyFlags.HardDependency)]
-	[BepInDependency("mtm101.rulerp.bbplus.baldidevapi", BepInDependency.DependencyFlags.HardDependency)] // let's not forget this
-	[BepInDependency("mtm101.rulerp.baldiplus.levelloader", BepInDependency.DependencyFlags.HardDependency)]
-	[BepInDependency("mtm101.rulerp.baldiplus.leveleditor", BepInDependency.DependencyFlags.SoftDependency)]
+	[BepInPlugin(guid_DecorationsPlus, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+	[BepInDependency(guid_PixelIntAPI, BepInDependency.DependencyFlags.HardDependency)]
+	[BepInDependency(guid_Mtm101API, BepInDependency.DependencyFlags.HardDependency)] // let's not forget this
+	[BepInDependency(guid_LevelLoader, BepInDependency.DependencyFlags.HardDependency)]
+	[BepInDependency(guid_LevelStudio, BepInDependency.DependencyFlags.SoftDependency)]
 
 	public class DecorsPlugin : BaseUnityPlugin
 	{
+		public const string
+		guid_LevelStudio = "mtm101.rulerp.baldiplus.levelstudio",
+		guid_LevelLoader = "mtm101.rulerp.baldiplus.levelstudioloader",
+		guid_Mtm101API = "mtm101.rulerp.bbplus.baldidevapi",
+		guid_PixelIntAPI = "pixelguy.pixelmodding.baldiplus.pixelinternalapi",
+		guid_DecorationsPlus = "pixelguy.pixelmodding.baldiplus.newdecors",
+		newDecor_PrefabPrefix = "NewDecorationsPlus_";
 		private void Awake()
 		{
 			path = AssetLoader.GetModPath(this);
-			var h = new Harmony("pixelguy.pixelmodding.baldiplus.newdecors");
+			var h = new Harmony(guid_DecorationsPlus);
 			h.PatchAllConditionals();
 
-			LoadingEvents.RegisterOnAssetsLoaded(Info, Load(), false);
+			LoadingEvents.RegisterOnAssetsLoaded(Info, Load(), LoadingEventOrder.Pre);
+
+			AssetLoader.LoadLocalizationFolder(Path.Combine(path, "Language", "English"), Language.English);
 		}
 
 		IEnumerator Load()
 		{
-			yield return loadSteps;
+			bool hasEditor = Chainloader.PluginInfos.ContainsKey(guid_LevelStudio);
+			yield return loadSteps + (hasEditor ? 1 : 0);
 
 			yield return "Loading planes...";
 			var basePlane = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -297,6 +309,13 @@ namespace NewPlusDecorations
 			slide.name = "Seesaw";
 			AddObjectToEditor(slide);
 
+			yield return "Loading the BookClosetShelf obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("BookClosetShelf"), new(4f, 4f, 4f), 0.35f, addMeshCollider: false);
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
+			slide.name = "BookClosetShelf";
+			AddObjectToEditor(slide);
+
 			yield return "Loading the Swingset obj...";
 			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f, addMeshCollider: false);
 
@@ -351,9 +370,10 @@ namespace NewPlusDecorations
 
 			yield return "Creating the Bush...";
 
-			var bush = AddDecoration("PlaygroundBush", "bush.png", 20f, Vector3.up * 3.5f, false);
+			var bush = AddDecoration("PlaygroundBush", "bush.png", 20f, false).AddSpriteHolder(out _, 3.5f);
 			bush.gameObject.AddBoxCollider(Vector3.up * 5f, new(3f, 5f, 3f), true);
 			bush.gameObject.layer = LayerStorage.iClickableLayer;
+			AddObjectToEditor(bush.gameObject);
 
 			var bushObj = bush.gameObject.AddComponent<Bush>();
 			bushObj.audMan = bush.gameObject.CreatePropagatedAudioManager(45f, 70f);
@@ -424,25 +444,19 @@ namespace NewPlusDecorations
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
-			AddDecoration("SmallPottedPlant", "plant.png", 25f, Vector3.up);
-			AddDecoration("TableLightLamp", "tablelamp.png", 25f, Vector3.up * 0.7f);
-			AddDecoration("BaldiPlush", "baldiPlush.png", 35f, Vector3.zero);
-			AddDecoration("FancyOfficeLamp", "veryLikeOfficeLamp.png", 29f, Vector3.zero);
-			AddDecoration("SaltAndHot", "saltObjects.png", 26f, Vector3.zero);
-			AddDecoration("TheRulesBook", "TheRulesBook.png", 25f, Vector3.zero);
+			AddDecoration("SmallPottedPlant", "plant.png", 25f);
+			AddDecoration("TableLightLamp", "tablelamp.png", 25f);
+			AddDecoration("BaldiPlush", "baldiPlush.png", 35f);
+			AddDecoration("FancyOfficeLamp", "veryLikeOfficeLamp.png", 29f);
+			AddDecoration("SaltAndHot", "saltObjects.png", 26f);
+			AddDecoration("TheRulesBook", "TheRulesBook.png", 25f);
 
-			RendererContainer AddDecoration(string name, string fileName, float pixelsPerUnit, Vector3 offset, bool hasFakeCollider = true)
+			SpriteRenderer AddDecoration(string name, string fileName, float pixelsPerUnit, bool addToEditor = true)
 			{
-				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit)).AddSpriteHolder(out var bredRend, offset);
-				bredRend.name = name + "_Renderer";
+				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit));
 				bred.name = name;
-				AddObjectToEditor(bred.gameObject);
-				if (!hasFakeCollider)
-				{
-					var start = bred.GetComponent<NoCollisionOnStart>();
-					Destroy(start.toDestroy);
-					Destroy(start);
-				}
+				if (addToEditor)
+					AddObjectToEditor(bred.gameObject);
 				//"editorPrefab_"
 				return bred;
 			}
@@ -505,6 +519,11 @@ namespace NewPlusDecorations
 
 
 
+			if (hasEditor)
+			{
+				yield return "Triggering editor integration...";
+				EditorIntegration.Initialize(man);
+			}
 			yield return "Triggering post setup...";
 
 
@@ -558,16 +577,11 @@ namespace NewPlusDecorations
 
 		void AddObjectToEditor(GameObject obj)
 		{
-			PlusLevelLoaderPlugin.Instance.prefabAliases.Add(obj.name, obj);
+			LevelLoaderPlugin.Instance.basicObjects.Add(newDecor_PrefabPrefix + obj.name, obj);
 			man.Add($"editorPrefab_{obj.name}", obj);
 			obj.ConvertToPrefab(true);
 
-			if (!obj.GetComponent<Collider>())
-			{
-				var col = obj.AddComponent<BoxCollider>();
-				col.size = new(2.5f, 5f, 2.5f); // Placeholder collider for the editor
-				obj.AddComponent<NoCollisionOnStart>().toDestroy = col;
-			}
+			Debug.Log($"\"{obj.name}\": \"{newDecor_PrefabPrefix + obj.name}\""); // Constructing the filter for the ConverterTool
 		}
 
 		static void PostSetup(AssetManager man) { }
