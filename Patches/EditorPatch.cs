@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Text.RegularExpressions;
 using MTM101BaldAPI.AssetTools;
 using PlusLevelStudio;
 using PlusLevelStudio.Editor;
@@ -60,7 +62,9 @@ namespace NewPlusDecorations.Patches
 			AddVisual("Slide");
 			AddVisual("Monkeybars");
 			AddVisual("Seesaw");
-			AddVisual("BookClosetShelf");
+			AddVisual("DinnerTable");
+			AddVisual("DinnerSeat");
+			AddVisual("DinnerMenu");
 			AddVisual("Swingset");
 			AddVisualWithCustomBoxCollider("OutsidePicnicSheet", new(6f, 1f, 6f), Vector3.zero);
 			AddVisualWithCustomBoxCollider("pavementCover", new(5f, 1f, 5f), Vector3.zero);
@@ -80,6 +84,7 @@ namespace NewPlusDecorations.Patches
 			AddVisualWithCustomSphereCollider("FancyOfficeLamp", Vector3.zero);
 			AddVisualWithCustomSphereCollider("SaltAndHot", Vector3.zero);
 			AddVisualWithCustomSphereCollider("TheRulesBook", Vector3.zero);
+			AddVisualWithCustomSphereCollider("PencilHolder", Vector3.zero);
 
 			// Columns
 			AddVisual("BigColumn");
@@ -92,23 +97,31 @@ namespace NewPlusDecorations.Patches
 		{
 			// Rotatable objects
 			var rotatableObjects = new ObjectWithOffset[]
-			{
+				{
 				new("Closet", 1.5f), new("Couch", 5.2f), new("RedCouch", 5.2f), new("GrandFatherClock", 3.5f), new("WallShelf", 1f), new("LongOfficeTable", 3.5f), "Slide",
-				"Monkeybars", "Seesaw", "BookClosetShelf", "Swingset", "pavementCorner", "pavementOutCorner",
-				"pavementLcover", "pavementRcover", "MetalChair", "MetalDesk"
-			};
+				"Monkeybars", "Seesaw", "Swingset", "pavementCorner", "pavementOutCorner",
+				"pavementLcover", "pavementRcover", "MetalChair", "MetalDesk", "DinnerTable", "DinnerSeat", new("DinnerMenu", 5f),
+				};
 			foreach (var obj in rotatableObjects)
+			{
+				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
+				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 				EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectTool(DecorsPlugin.newDecor_PrefabPrefix + obj.key, GetSprite(obj.key), obj.offset));
+			}
 
 			// Non-Rotatable objects
 			var nonRotatableObjects = new ObjectWithOffset[]
 			{
 				"OutsidePicnicSheet", "pavementCover", "PlaygroundBush", "GreenBird", "OrangeBird", "PurpleBird",
 				new("SmallPottedPlant", 5f), new("TableLightLamp", 5f), new("BaldiPlush", 5.7f), new("FancyOfficeLamp", 5f), new("SaltAndHot", 4f),
-				new("TheRulesBook", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f)
+				new("TheRulesBook", 5f), new("PencilHolder", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f)
 			};
 			foreach (var obj in nonRotatableObjects)
+			{
+				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
+				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 				EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation(DecorsPlugin.newDecor_PrefabPrefix + obj.key, GetSprite(obj.key), obj.offset));
+			}
 
 			// Bulk / Prebuilt Tools
 			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("highShelf", GetSprite("highShelf"),
@@ -130,6 +143,13 @@ namespace NewPlusDecorations.Patches
 				new("MetalChair", new Vector3(3.5f, 0f, -3.5f)),
 				new("MetalChair", new Vector3(-3.5f, 0f, -3.5f))
 			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("dinnerRow", GetSprite("dinnerRow"),
+			[
+				new("DinnerSeat", new(0f, 0f, 5.25f), new(0f, 180f, 0f)),
+				new("DinnerTable", Vector3.zero),
+				new("DinnerSeat", new(0f, 0f, -5.25f))
+			]).CorrectlyAssignKeys());
 		}
 
 		private static Sprite GetSprite(string name)
@@ -144,8 +164,14 @@ namespace NewPlusDecorations.Patches
 
 		static BulkObjectTool CorrectlyAssignKeys(this BulkObjectTool objTool)
 		{
+			string oldName = objTool.type;
+			objTool.type = DecorsPlugin.newDecor_PrefabPrefix + objTool.type;
+			Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Title\",\"value\":\"" + ToReadableName(oldName) + "\"},");
+			Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 			for (int i = 0; i < objTool.data.Length; i++)
+			{
 				objTool.data[i].prefab = DecorsPlugin.newDecor_PrefabPrefix + objTool.data[i].prefab;
+			}
 			return objTool;
 		}
 
@@ -157,6 +183,20 @@ namespace NewPlusDecorations.Patches
 			readonly public string key = key;
 			readonly public float offset = 0f;
 			public override string ToString() => $"{key} => Y: {offset}";
+		}
+		static string ToReadableName(string key)
+		{
+			if (string.IsNullOrEmpty(key)) return key;
+			// Replace underscores/dashes with spaces
+			string s = key.Replace('_', ' ').Replace('-', ' ');
+			// Insert space between lower-case or digits and upper-case letters: "bookShelf" -> "book Shelf"
+			s = Regex.Replace(s, "([a-z0-9])([A-Z])", "$1 $2");
+			// Also insert space between consecutive upper-case followed by lower-case (e.g., "XMLHttp" -> "XML Http")
+			s = Regex.Replace(s, "([A-Z]+)([A-Z][a-z])", "$1 $2");
+			// Normalize case and then title-case each word
+			s = s.ToLowerInvariant();
+			s = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s);
+			return s;
 		}
 	}
 }

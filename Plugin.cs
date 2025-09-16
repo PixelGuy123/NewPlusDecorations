@@ -40,6 +40,13 @@ namespace NewPlusDecorations
 			LoadingEvents.RegisterOnAssetsLoaded(Info, Load(), LoadingEventOrder.Pre);
 
 			AssetLoader.LoadLocalizationFolder(Path.Combine(path, "Language", "English"), Language.English);
+			
+#if KOFI
+			MTM101BaldiDevAPI.AddWarningScreen(
+				"<color=#c900d4>Ko-fi Exclusive Build!</color>\nKo-fi members helped make this possible. This Lots O\' Items build was made exclusively for supporters. Please, don't share it publicly. If you'd like to support future content, visit my Ko-fi page!",
+				false
+			);
+#endif
 		}
 
 		IEnumerator Load()
@@ -309,11 +316,29 @@ namespace NewPlusDecorations
 			slide.name = "Seesaw";
 			AddObjectToEditor(slide);
 
-			yield return "Loading the BookClosetShelf obj";
-			slide = SetupObjCollisionAndScale(LoadObjFile("BookClosetShelf"), new(4f, 4f, 4f), 0.35f, addMeshCollider: false);
+			yield return "Loading the DinnerTable obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerTable"), default, 0.25f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
-			slide.name = "BookClosetShelf";
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
+			slide.gameObject.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.name = "DinnerTable";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the DinnerSeat obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerSeat"), default, 0.25f, addMeshCollider: false);
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
+			slide.gameObject.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.name = "DinnerSeat";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the DinnerMenu obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerMenu"), default, 0.65f, addMeshCollider: false);
+
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.gameObject.AddBoxCollider(Vector3.up * 2.5f, new(6.5f, 5f, 2f), false);
+			slide.gameObject.AddNavObstacle(Vector3.up * 2.5f, new(7f, 5f, 2f));
+			slide.name = "DinnerMenu";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the Swingset obj...";
@@ -370,10 +395,9 @@ namespace NewPlusDecorations
 
 			yield return "Creating the Bush...";
 
-			var bush = AddDecoration("PlaygroundBush", "bush.png", 20f, false).AddSpriteHolder(out _, 3.5f);
+			var bush = AddDecorationWithHolder("PlaygroundBush", "bush.png", 20f, Vector3.up * 3.5f);
 			bush.gameObject.AddBoxCollider(Vector3.up * 5f, new(3f, 5f, 3f), true);
 			bush.gameObject.layer = LayerStorage.iClickableLayer;
-			AddObjectToEditor(bush.gameObject);
 
 			var bushObj = bush.gameObject.AddComponent<Bush>();
 			bushObj.audMan = bush.gameObject.CreatePropagatedAudioManager(45f, 70f);
@@ -450,14 +474,23 @@ namespace NewPlusDecorations
 			AddDecoration("FancyOfficeLamp", "veryLikeOfficeLamp.png", 29f);
 			AddDecoration("SaltAndHot", "saltObjects.png", 26f);
 			AddDecoration("TheRulesBook", "TheRulesBook.png", 25f);
+			AddDecoration("PencilHolder", "PencilHolder.png", 25f);
 
-			SpriteRenderer AddDecoration(string name, string fileName, float pixelsPerUnit, bool addToEditor = true)
+			SpriteRenderer AddDecoration(string name, string fileName, float pixelsPerUnit)
 			{
 				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit));
 				bred.name = name;
-				if (addToEditor)
-					AddObjectToEditor(bred.gameObject);
+				AddObjectToEditor(bred.gameObject);
 				//"editorPrefab_"
+				return bred;
+			}
+
+			RendererContainer AddDecorationWithHolder(string name, string fileName, float pixelsPerUnit, Vector3 offset)
+			{
+				var bred = ObjectCreationExtensions.CreateSpriteBillboard(AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(Path.Combine(path, fileName)), pixelsPerUnit))
+				.AddSpriteHolder(out _, offset);
+				bred.name = name;
+				AddObjectToEditor(bred.gameObject);
 				return bred;
 			}
 
@@ -530,7 +563,7 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		const int loadSteps = 18;
+		const int loadSteps = 20;
 
 		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{
@@ -581,7 +614,7 @@ namespace NewPlusDecorations
 			man.Add($"editorPrefab_{obj.name}", obj);
 			obj.ConvertToPrefab(true);
 
-			Debug.Log($"\"{obj.name}\": \"{newDecor_PrefabPrefix + obj.name}\""); // Constructing the filter for the ConverterTool
+			// Debug.Log($"\"{obj.name}\": \"{newDecor_PrefabPrefix + obj.name}\""); // Constructing the filter for the ConverterTool
 		}
 
 		static void PostSetup(AssetManager man) { }
