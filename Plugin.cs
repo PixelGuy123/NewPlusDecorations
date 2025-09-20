@@ -38,15 +38,22 @@ namespace NewPlusDecorations
 			h.PatchAllConditionals();
 
 			LoadingEvents.RegisterOnAssetsLoaded(Info, Load(), LoadingEventOrder.Pre);
+			LoadingEvents.RegisterOnAssetsLoaded(Info, PostLoad, LoadingEventOrder.Post);
 
 			AssetLoader.LoadLocalizationFolder(Path.Combine(path, "Language", "English"), Language.English);
-			
+
 #if KOFI
 			MTM101BaldiDevAPI.AddWarningScreen(
 				"<color=#c900d4>Ko-fi Exclusive Build!</color>\nKo-fi members helped make this possible. This Lots O\' Items build was made exclusively for supporters. Please, don't share it publicly. If you'd like to support future content, visit my Ko-fi page!",
 				false
 			);
 #endif
+		}
+
+		void PostLoad()
+		{
+			var allShoppingItems = MiscExtensions.GetAllShoppingItems();
+			CardboardBox.itemLootBox.AddRange(allShoppingItems);
 		}
 
 		IEnumerator Load()
@@ -296,7 +303,7 @@ namespace NewPlusDecorations
 			yield return "Loading the Slide obj...";
 			var slide = SetupObjCollisionAndScale(LoadObjFile("Slide"), new(15f, 10f, 4.5f), 0.25f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 5.55f), false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 5.55f), false);
 			slide.name = "Slide";
 			AddObjectToEditor(slide);
 
@@ -312,23 +319,23 @@ namespace NewPlusDecorations
 			yield return "Loading the Seesaw obj...";
 			slide = SetupObjCollisionAndScale(LoadObjFile("Seesaw"), new(15.85f, 10f, 4.5f), 0.35f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(14f, 5f, 3f), false);
 			slide.name = "Seesaw";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the DinnerTable obj";
-			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerTable"), default, 0.25f, addMeshCollider: false);
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerTable"), default, 0.15f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
-			slide.gameObject.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
+			slide.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
 			slide.name = "DinnerTable";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the DinnerSeat obj";
 			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerSeat"), default, 0.25f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
-			slide.gameObject.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
+			slide.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
 			slide.name = "DinnerSeat";
 			AddObjectToEditor(slide);
 
@@ -336,16 +343,32 @@ namespace NewPlusDecorations
 			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerMenu"), default, 0.65f, addMeshCollider: false);
 
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 2.5f, new(6.5f, 5f, 2f), false);
-			slide.gameObject.AddNavObstacle(Vector3.up * 2.5f, new(7f, 5f, 2f));
+			slide.AddBoxCollider(Vector3.up * 2.5f, new(6.5f, 5f, 2f), false);
+			slide.AddNavObstacle(Vector3.up * 2.5f, new(7f, 5f, 2f));
 			slide.name = "DinnerMenu";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the CardboardBox obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("CardboardBox"), default, 0.99f, addMeshCollider: false);
+
+			slide.AddNavObstacle(Vector3.up * 5f, new(5.5f, 10f, 5.5f));
+			slide.name = "CardboardBox";
+
+			var cardboardBox = slide.AddComponent<CardboardBox>();
+			cardboardBox.audNope = ((ITM_PortalPoster)ItemMetaStorage.Instance.FindByEnum(Items.PortalPoster).value.item).audNo;
+			cardboardBox.audSlide = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromFile(Path.Combine(path, "CardboardBox_Slide.wav")), string.Empty, SoundType.Effect, Color.white);
+			cardboardBox.audSlide.subtitle = false;
+			cardboardBox.audMan = slide.CreatePropagatedAudioManager(45f, 85f);
+
+			cardboardBox.collider = slide.AddBoxCollider(Vector3.up * 5f, new(5f, 10f, 5f), false);
+
 			AddObjectToEditor(slide);
 
 			yield return "Loading the Swingset obj...";
 			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f, addMeshCollider: false);
 
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(8.85f, 5f, 5f), false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(8.85f, 5f, 5f), false);
 
 			slide.name = "Swingset";
 			AddObjectToEditor(slide);
@@ -354,7 +377,7 @@ namespace NewPlusDecorations
 			slide = SetupObjCollisionAndScale(LoadObjFile("MetalChair"), new(2f, 10f, 2f), 1f, addMeshCollider: false);
 
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(1.75f, 5f, 1.75f), false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(1.75f, 5f, 1.75f), false);
 
 			slide.name = "MetalChair";
 			AddObjectToEditor(slide);
@@ -363,7 +386,7 @@ namespace NewPlusDecorations
 			slide = SetupObjCollisionAndScale(LoadObjFile("MetalDesk"), new(12f, 10f, 4.5f), 1f, addMeshCollider: false);
 
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.gameObject.AddBoxCollider(Vector3.up * 5f, new(11f, 5f, 4f), false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(11f, 5f, 4f), false);
 
 			slide.name = "MetalDesk";
 			AddObjectToEditor(slide);
@@ -563,7 +586,7 @@ namespace NewPlusDecorations
 			PostSetup(man);
 		}
 
-		const int loadSteps = 20;
+		const int loadSteps = 21;
 
 		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{

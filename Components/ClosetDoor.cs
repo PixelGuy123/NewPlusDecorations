@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace NewPlusDecorations
+namespace NewPlusDecorations.Components
 {
 	public class ClosetDoor : EnvironmentObject, IClickable<int>
 	{

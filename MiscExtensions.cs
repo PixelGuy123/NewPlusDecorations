@@ -1,12 +1,16 @@
 ﻿
-using UnityEngine.AI;
-using UnityEngine;
+using System.Collections.Generic;
+using HarmonyLib;
+using MTM101BaldAPI.Registers;
 using PixelInternalAPI.Classes;
+using PixelInternalAPI.Extensions;
+using UnityEngine;
+using UnityEngine.AI;
 
 namespace NewPlusDecorations
 {
-    internal static class MiscExtensions
-    {
+	internal static class MiscExtensions
+	{
 		public static BoxCollider AddBoxCollider(this GameObject g, Vector3 center, Vector3 size, bool isTrigger)
 		{
 			var c = g.AddComponent<BoxCollider>();
@@ -51,6 +55,21 @@ namespace NewPlusDecorations
 		{
 			obj.layer = LayerStorage.ignoreRaycast;
 			return obj;
+		}
+
+		internal static List<ItemObject> GetAllShoppingItems()
+		{
+			List<ItemObject> itmObjs = [];
+			foreach (var s in GenericExtensions.FindResourceObjects<SceneObject>())
+			{
+				s.shopItems.Do(x =>
+				{
+					var meta = x.selection.GetMeta();
+					if (meta != null && !itmObjs.Contains(meta.value))
+						itmObjs.Add(meta.value);
+				});
+			}
+			return itmObjs;
 		}
 	}
 }

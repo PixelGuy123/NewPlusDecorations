@@ -65,6 +65,7 @@ namespace NewPlusDecorations.Patches
 			AddVisual("DinnerTable");
 			AddVisual("DinnerSeat");
 			AddVisual("DinnerMenu");
+			AddVisual("CardboardBox");
 			AddVisual("Swingset");
 			AddVisualWithCustomBoxCollider("OutsidePicnicSheet", new(6f, 1f, 6f), Vector3.zero);
 			AddVisualWithCustomBoxCollider("pavementCover", new(5f, 1f, 5f), Vector3.zero);
@@ -114,7 +115,7 @@ namespace NewPlusDecorations.Patches
 			{
 				"OutsidePicnicSheet", "pavementCover", "PlaygroundBush", "GreenBird", "OrangeBird", "PurpleBird",
 				new("SmallPottedPlant", 5f), new("TableLightLamp", 5f), new("BaldiPlush", 5.7f), new("FancyOfficeLamp", 5f), new("SaltAndHot", 4f),
-				new("TheRulesBook", 5f), new("PencilHolder", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f)
+				new("TheRulesBook", 5f), new("PencilHolder", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f), new("CardboardBox", 0f)
 			};
 			foreach (var obj in nonRotatableObjects)
 			{
@@ -149,6 +150,14 @@ namespace NewPlusDecorations.Patches
 				new("DinnerSeat", new(0f, 0f, 5.25f), new(0f, 180f, 0f)),
 				new("DinnerTable", Vector3.zero),
 				new("DinnerSeat", new(0f, 0f, -5.25f))
+			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("cardboardBoxTile", GetSprite("cardboardBoxTile"),
+			[
+				new("CardboardBox", new(2.5f, 0f, 2.5f)),
+				new("CardboardBox", new(-2.5f, 0f, 2.5f)),
+				new("CardboardBox", new(2.5f, 0f, -2.5f)),
+				new("CardboardBox", new(-2.5f, 0f, -2.5f)),
 			]).CorrectlyAssignKeys());
 		}
 
