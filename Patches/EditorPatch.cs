@@ -38,16 +38,19 @@ namespace NewPlusDecorations.Patches
 
 				_editorAssetMan.Add("UI/" + DecorsPlugin.newDecor_PrefabPrefix + name, AssetLoader.SpriteFromTexture2D(AssetLoader.TextureFromFile(file), 1f));
 			}
+
+			foreach (var studentSprite in prefabs_students_icons)
+				_editorAssetMan.Add("UI/" + DecorsPlugin.newDecor_PrefabPrefix + studentSprite.Key, studentSprite.Value);
 		}
 
 		private static void InitializeVisuals(AssetManager man)
 		{
 			// Helper to reduce redudant code
-			void AddVisual(string key, bool useRegularCollider = true) =>
+			EditorBasicObject AddVisual(string key, bool useRegularCollider = true) =>
 				EditorInterface.AddObjectVisual(DecorsPlugin.newDecor_PrefabPrefix + key, man.Get<GameObject>("editorPrefab_" + key), useRegularCollider);
-			void AddVisualWithCustomSphereCollider(string key, Vector3 center, float radius = 1f) =>
+			EditorBasicObject AddVisualWithCustomSphereCollider(string key, Vector3 center, float radius = 1f) =>
 				EditorInterface.AddObjectVisualWithCustomSphereCollider(DecorsPlugin.newDecor_PrefabPrefix + key, man.Get<GameObject>("editorPrefab_" + key), radius, center);
-			void AddVisualWithCustomBoxCollider(string key, Vector3 size, Vector3 center) =>
+			EditorBasicObject AddVisualWithCustomBoxCollider(string key, Vector3 size, Vector3 center) =>
 				EditorInterface.AddObjectVisualWithCustomBoxCollider(DecorsPlugin.newDecor_PrefabPrefix + key, man.Get<GameObject>("editorPrefab_" + key), size, center);
 
 
@@ -64,9 +67,16 @@ namespace NewPlusDecorations.Patches
 			AddVisual("Seesaw");
 			AddVisual("DinnerTable");
 			AddVisual("DinnerSeat");
-			AddVisual("DinnerMenu");
 			AddVisual("CardboardBox");
+			AddVisual("Cubby");
+			AddVisual("PrisonBar");
+			AddVisual("DinnerWoodenTable");
+			AddVisual("Planter");
+			AddVisual("Pallet");
+			AddVisual("HalfShelf");
 			AddVisual("Swingset");
+			foreach (var studentName in prefabs_students_names)
+				AddVisual(studentName).gameObject.ReplaceAnimatedRotators();
 			AddVisualWithCustomBoxCollider("OutsidePicnicSheet", new(6f, 1f, 6f), Vector3.zero);
 			AddVisualWithCustomBoxCollider("pavementCover", new(5f, 1f, 5f), Vector3.zero);
 			AddVisualWithCustomBoxCollider("pavementCorner", new(5f, 1f, 5f), Vector3.zero);
@@ -86,6 +96,7 @@ namespace NewPlusDecorations.Patches
 			AddVisualWithCustomSphereCollider("SaltAndHot", Vector3.zero);
 			AddVisualWithCustomSphereCollider("TheRulesBook", Vector3.zero);
 			AddVisualWithCustomSphereCollider("PencilHolder", Vector3.zero);
+			AddVisualWithCustomSphereCollider("DinnerMenu", Vector3.zero);
 
 			// Columns
 			AddVisual("BigColumn");
@@ -97,30 +108,39 @@ namespace NewPlusDecorations.Patches
 		private static void InitializeTools(EditorMode mode, bool isVanillaCompliant)
 		{
 			// Rotatable objects
-			var rotatableObjects = new ObjectWithOffset[]
-				{
+			var rotatableObjects = new List<ObjectWithOffset>
+			{
 				new("Closet", 1.5f), new("Couch", 5.2f), new("RedCouch", 5.2f), new("GrandFatherClock", 3.5f), new("WallShelf", 1f), new("LongOfficeTable", 3.5f), "Slide",
 				"Monkeybars", "Seesaw", "Swingset", "pavementCorner", "pavementOutCorner",
-				"pavementLcover", "pavementRcover", "MetalChair", "MetalDesk", "DinnerTable", "DinnerSeat", new("DinnerMenu", 5f),
-				};
+				"pavementLcover", "pavementRcover", "MetalChair", "MetalDesk", "DinnerTable", "DinnerSeat", "Cubby", "PrisonBar", "Pallet", "HalfShelf"
+			};
+			foreach (var studentName in prefabs_students_names)
+			{
+				rotatableObjects.Add(new(studentName, 5f));
+			}
+
+			// Register
 			foreach (var obj in rotatableObjects)
 			{
-				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
-				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
+				// Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
+				// Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 				EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectTool(DecorsPlugin.newDecor_PrefabPrefix + obj.key, GetSprite(obj.key), obj.offset));
 			}
 
 			// Non-Rotatable objects
-			var nonRotatableObjects = new ObjectWithOffset[]
+			var nonRotatableObjects = new List<ObjectWithOffset>
 			{
 				"OutsidePicnicSheet", "pavementCover", "PlaygroundBush", "GreenBird", "OrangeBird", "PurpleBird",
 				new("SmallPottedPlant", 5f), new("TableLightLamp", 5f), new("BaldiPlush", 5.7f), new("FancyOfficeLamp", 5f), new("SaltAndHot", 4f),
-				new("TheRulesBook", 5f), new("PencilHolder", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f), new("CardboardBox", 0f)
+				new("TheRulesBook", 5f), new("PencilHolder", 5f), new("BigColumn", 5f), new("MediumColumn", 5f), new("SmallColumn", 5f), new("ThinColumn", 5f), "CardboardBox",
+				new("DinnerMenu", 6.25f), "DinnerWoodenTable", "Planter"
 			};
+
+			// Register
 			foreach (var obj in nonRotatableObjects)
 			{
-				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
-				Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
+				// Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Title\",\"value\":\"" + ToReadableName(obj.key) + "\"},");
+				// Debug.Log("{\"key\":\"Ed_Tool_object_" + DecorsPlugin.newDecor_PrefabPrefix + obj.key + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 				EditorInterfaceModes.AddToolToCategory(mode, "objects", new ObjectToolNoRotation(DecorsPlugin.newDecor_PrefabPrefix + obj.key, GetSprite(obj.key), obj.offset));
 			}
 
@@ -157,8 +177,48 @@ namespace NewPlusDecorations.Patches
 				new("CardboardBox", new(2.5f, 0f, 2.5f)),
 				new("CardboardBox", new(-2.5f, 0f, 2.5f)),
 				new("CardboardBox", new(2.5f, 0f, -2.5f)),
-				new("CardboardBox", new(-2.5f, 0f, -2.5f)),
+				new("CardboardBox", new(-2.5f, 0f, -2.5f))
 			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("CubbyWall", GetSprite("CubbyWall"),
+			[
+				new("Cubby", new(-3.99f, 0f, 3.99f)),
+				new("Cubby", new(-2f, 0f, 3.99f)),
+				new("Cubby", new(0f, 0f, 3.99f)),
+				new("Cubby", new(2f, 0f, 3.99f)),
+				new("Cubby", new(3.99f, 0f, 3.99f))
+			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("PrisonBarCorner", GetSprite("PrisonBarCorner"),
+			[
+				new("PrisonBar", new(5f, 0f, 0f), new(0f, 90f, 0f)),
+				new("PrisonBar", new(0f, 0f, 5f), new(0f, 0f, 0f))
+			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("DinnerWoodenTable_FourCardinal", GetSprite("DinnerWoodenTable_FourCardinal"),
+			[
+				new("DinnerWoodenTable", new(0f, 0f, 0f)),
+				new("_chair", new(0f, 0f, -5f), new(0f, 0f, 0f)),
+				new("_chair", new(-5f, 0f, 0f), new(0f, 90f, 0f)),
+				new("_chair", new(0f, 0f, 5f), new(0f, 180f, 0f)),
+				new("_chair", new(5f, 0f, 0f), new(0f, 270f, 0f))
+			]).CorrectlyAssignKeys());
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("DinnerWoodenTable_FourDiagonal", GetSprite("DinnerWoodenTable_FourDiagonal"),
+			[
+				new("DinnerWoodenTable", new(0f, 0f, 0f)),
+				new("_chair", new(4f, 0f, -4f), new(0f, 315f, 0f)), // Bottom right
+				new("_chair", new(-4f, 0f, 4f), new(0f, 135f, 0f)), // Top left
+				new("_chair", new(-4f, 0f, -4f), new(0f, 45f, 0f)), // Bottom left
+				new("_chair", new(4f, 0f, 4f), new(0f, 225f, 0f)) // Top right
+			]).CorrectlyAssignKeys());
+
+			List<BulkObjectData> dynamicBulkData = [new("Planter", new(0f, 0f, 0f))];
+			for (float x = -3.25f; x <= 3.25f; x++) // small area for plants
+				for (float z = -3.25f; z <= 3.25f; z++)
+					dynamicBulkData.Add(new("_plant", new(x, 1.5f, z)));
+
+			EditorInterfaceModes.AddToolToCategory(mode, "objects", new BulkObjectTool("PlanterFillment", GetSprite("PlanterFillment"), [.. dynamicBulkData]).CorrectlyAssignKeys());
 		}
 
 		private static Sprite GetSprite(string name)
@@ -175,11 +235,14 @@ namespace NewPlusDecorations.Patches
 		{
 			string oldName = objTool.type;
 			objTool.type = DecorsPlugin.newDecor_PrefabPrefix + objTool.type;
-			Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Title\",\"value\":\"" + ToReadableName(oldName) + "\"},");
-			Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
+			// Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Title\",\"value\":\"" + ToReadableName(oldName) + "\"},");
+			// Debug.Log("{\"key\":\"Ed_Tool_" + objTool.id + "_Desc\",\"value\":\"[DESCRIPTION]\"},");
 			for (int i = 0; i < objTool.data.Length; i++)
 			{
-				objTool.data[i].prefab = DecorsPlugin.newDecor_PrefabPrefix + objTool.data[i].prefab;
+				if (objTool.data[i].prefab[0] != '_') // _ will indicate whether it should be kept as it is or be changed
+					objTool.data[i].prefab = DecorsPlugin.newDecor_PrefabPrefix + objTool.data[i].prefab;
+				else
+					objTool.data[i].prefab = objTool.data[i].prefab.Remove(0, 1); // Removes the first '_'
 			}
 			return objTool;
 		}
@@ -207,5 +270,9 @@ namespace NewPlusDecorations.Patches
 			s = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(s);
 			return s;
 		}
+
+		// Specific lists for objects that have their names dynamically added
+		public static List<string> prefabs_students_names = [];
+		public static List<KeyValuePair<string, Sprite>> prefabs_students_icons = [];
 	}
 }

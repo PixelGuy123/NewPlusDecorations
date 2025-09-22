@@ -7,7 +7,7 @@ namespace NewPlusDecorations.Components;
 public class CardboardBox : EnvironmentObject, IItemAcceptor, IClickable<int>
 {
     [SerializeField]
-    internal float moveOffset = 5f;
+    internal float moveOffset = 5f, boundExtentFactor = 0.98f, slideTime = 0.85f;
     [SerializeField]
     [Range(0f, 1f)]
     internal float itemRewardChance = 0.25f;
@@ -25,18 +25,36 @@ public class CardboardBox : EnvironmentObject, IItemAcceptor, IClickable<int>
         float t = 0f;
 
         // Duration goes by the sound
-        float slideDuration = audSlide.subDuration;
         audMan.PlaySingle(audSlide);
-
-        while (t < slideDuration)
+        bool interruptLoop = false;
+        while (t < slideTime)
         {
             t += ec.EnvironmentTimeScale * Time.deltaTime;
-            transform.position = Vector3.Lerp(start, newPos, Mathf.Clamp01(t / slideDuration));
+            Vector3 nextPos = Vector3.Lerp(start, newPos, Mathf.Clamp01(t / slideTime));
+
+            // Check entity overlapping
+            var checkBounds = collider.bounds;
+            checkBounds.center = nextPos;
+            var overlapping = Physics.OverlapBox(checkBounds.center, checkBounds.extents * boundExtentFactor, transform.rotation, -1, QueryTriggerInteraction.Ignore);
+            for (int i = 0; i < overlapping.Length; i++)
+            {
+                var o = overlapping[i];
+                if (o.transform != transform) // If there's anything interrupting, stop the box
+                {
+                    interruptLoop = true;
+                    break;
+                }
+            }
+            if (interruptLoop) break;
+
+            transform.position = nextPos;
+
             yield return null;
         }
 
-        transform.position = newPos;
-        currentCell = ec.CellFromPosition(transform.position);
+        if (!interruptLoop) transform.position = newPos;
+        else audMan.FlushQueue(true);
+
         sliding = false;
         yield break;
     }
@@ -52,24 +70,20 @@ public class CardboardBox : EnvironmentObject, IItemAcceptor, IClickable<int>
 
     public bool ItemFits(Items item) => acceptableCuttingItems.Contains(item);
 
-    public override void LoadingFinished()
-    {
-        base.LoadingFinished();
-        currentCell = ec.CellFromPosition(transform.position);
-    }
     public void Clicked(int player)
     {
         if (sliding) return;
-        var pm = Singleton<CoreGameManager>.Instance.GetPlayer(player);
 
         // Get dir from forward, then get the targetPos
-        Vector3 targetPos = transform.position + Directions.DirFromVector3(pm.transform.forward, 45f).ToVector3() * moveOffset;
+        Vector3 dir = Directions.DirFromVector3(Singleton<CoreGameManager>.Instance.GetCamera(player).transform.forward, 45f).ToVector3();
+        Vector3 targetPos = transform.position + dir * moveOffset;
+        Vector3 nextFramePos = transform.position + dir * 0.2f;
 
-        // Collision check with the boxcollider bounds
+        // Collision check with the boxcollider bounds for the next frame
         var checkBounds = collider.bounds;
-        checkBounds.center = targetPos;
+        checkBounds.center = nextFramePos;
 
-        var overlapping = Physics.OverlapBox(checkBounds.center, checkBounds.extents * 0.9f, transform.rotation, -1, QueryTriggerInteraction.Ignore);
+        var overlapping = Physics.OverlapBox(checkBounds.center, checkBounds.extents * boundExtentFactor, transform.rotation, -1, QueryTriggerInteraction.Ignore);
         bool blocked = false;
         foreach (var o in overlapping)
         {
@@ -99,7 +113,6 @@ public class CardboardBox : EnvironmentObject, IItemAcceptor, IClickable<int>
 
     public bool ClickableRequiresNormalHeight() => true;
 
-    Cell currentCell;
     Coroutine goToCoroutine;
     bool sliding = false;
     internal static List<ItemObject> itemLootBox = [];

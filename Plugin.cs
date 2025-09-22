@@ -11,6 +11,7 @@ using NewPlusDecorations.Components;
 using NewPlusDecorations.Patches;
 using PixelInternalAPI.Classes;
 using PixelInternalAPI.Extensions;
+using PlusLevelStudio;
 using PlusStudioLevelLoader;
 using UnityEngine;
 
@@ -324,34 +325,71 @@ namespace NewPlusDecorations
 			AddObjectToEditor(slide);
 
 			yield return "Loading the DinnerTable obj";
-			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerTable"), default, 0.15f, addMeshCollider: false);
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerTable"), default, 1f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
-			slide.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.AddBoxCollider(Vector3.up * 5f, new(12f, 10f, 4f), false);
+			slide.AddNavObstacle(Vector3.up * 5f, new(12.5f, 10f, 4.5f));
 			slide.name = "DinnerTable";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the DinnerSeat obj";
-			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerSeat"), default, 0.25f, addMeshCollider: false);
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerSeat"), default, 1f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 6f), false);
-			slide.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 6.5f));
+			slide.AddBoxCollider(Vector3.up * 5f, new(12f, 10f, 4f), false);
+			slide.AddNavObstacle(Vector3.up * 5f, new(12.5f, 10f, 4.5f));
 			slide.name = "DinnerSeat";
 			AddObjectToEditor(slide);
 
-			yield return "Loading the DinnerMenu obj";
-			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerMenu"), default, 0.65f, addMeshCollider: false);
+			yield return "Loading the Cubby obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("Cubby"), default, 1f, addMeshCollider: false);
+			slide.AddBoxCollider(Vector3.up * 4f, new(2f, 8f, 2f), false);
+			slide.AddNavObstacle(Vector3.up * 4f, new(2.5f, 8f, 2.5f));
+			slide.name = "Cubby";
+			AddObjectToEditor(slide);
 
+			yield return "Loading the Prison Bar obj";
 			slide.layer = LayerStorage.ignoreRaycast;
-			slide.AddBoxCollider(Vector3.up * 2.5f, new(6.5f, 5f, 2f), false);
-			slide.AddNavObstacle(Vector3.up * 2.5f, new(7f, 5f, 2f));
-			slide.name = "DinnerMenu";
+			slide = SetupObjCollisionAndScale(LoadObjFile("PrisonBar"), default, 1f, addMeshCollider: false);
+			slide.AddBoxCollider(Vector3.up * 5f, new(10f, 10f, 1f), false);
+			slide.AddNavObstacle(Vector3.up * 5f, new(10f, 10f, 1.5f));
+			slide.name = "PrisonBar";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the DinnerWoodenTable obj";
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerWoodenTable"), default, 1f);
+			slide.AddNavObstacle(Vector3.up * 5f, new(10f, 22f, 10f)).shape = UnityEngine.AI.NavMeshObstacleShape.Capsule;
+			slide.name = "DinnerWoodenTable";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the HalfShelf obj";
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide = SetupObjCollisionAndScale(LoadObjFile("HalfShelf"), default, 1f, addMeshCollider: false);
+			slide.AddBoxCollider(Vector3.up * 2.5f, new(7f, 5f, 3f), false);
+			slide.AddNavObstacle(Vector3.up * 2.5f, new(7.5f, 5f, 3.5f));
+			slide.name = "HalfShelf";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the Pallet obj";
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide = SetupObjCollisionAndScale(LoadObjFile("Pallet"), default, 1f, addMeshCollider: false);
+			slide.AddBoxCollider(Vector3.up * 1.5f, new(9f, 3f, 9f), false);
+			slide.AddNavObstacle(Vector3.up * 1.5f, new(9.5f, 3f, 9.5f));
+			slide.name = "Pallet";
+			AddObjectToEditor(slide);
+
+			yield return "Loading the Planter obj";
+			slide = SetupObjCollisionAndScale(LoadObjFile("Planter"), default, 1f, addMeshCollider: false);
+			slide.layer = LayerStorage.ignoreRaycast;
+			slide.AddBoxCollider(Vector3.up * 2f, new(10f, 4f, 10f), false);
+			slide.AddNavObstacle(Vector3.up * 2f, new(10.5f, 4f, 10.5f));
+			slide.name = "Planter";
 			AddObjectToEditor(slide);
 
 			yield return "Loading the CardboardBox obj";
 			slide = SetupObjCollisionAndScale(LoadObjFile("CardboardBox"), default, 0.99f, addMeshCollider: false);
 
-			slide.AddNavObstacle(Vector3.up * 5f, new(5.5f, 10f, 5.5f));
+			slide.AddNavObstacle(Vector3.up * 5f, new(8f, 10f, 8f));
 			slide.name = "CardboardBox";
 
 			var cardboardBox = slide.AddComponent<CardboardBox>();
@@ -488,6 +526,40 @@ namespace NewPlusDecorations
 					);
 			}
 
+			yield return "Creating students...";
+
+			foreach (var student in Resources.FindObjectsOfTypeAll<Student>())
+			{
+				student.gameObject.SetActive(false); // Be disabled by default for duplication
+				var newStudent = student.DuplicatePrefab();
+				student.gameObject.SetActive(true); // Leave as it is, we go focus in new student now
+
+				var newStudentObj = newStudent.gameObject;
+				newStudentObj.name += "_Object";
+				newStudentObj.layer = LayerStorage.ignoreRaycast;
+				var studentVisual = newStudent.spriteRenderer[0].sprite;
+
+				newStudent.spriteRenderer[0].gameObject.layer = LayerStorage.billboardLayer;
+				newStudent.spriteBase.layer = 0;
+
+				// No npc component, just a sole student
+				Destroy(newStudent.thoughtObject); // destroys this object since it's unnecessary
+				Destroy(newStudent); // Strip this off the student
+				Destroy(newStudentObj.GetComponent<Entity>());
+				Destroy(newStudentObj.GetComponent<Looker>());
+				Destroy(newStudentObj.GetComponent<Navigator>());
+				Destroy(newStudentObj.GetComponent<Animator>());
+				Destroy(newStudentObj.GetComponent<Rigidbody>());
+				foreach (var audMan in newStudentObj.GetComponents<AudioManager>())
+					Destroy(audMan); // Destroy every single audioManager
+				foreach (var collider in newStudentObj.GetComponents<Collider>())
+					collider.isTrigger = true;
+
+				AddObjectToEditor(newStudentObj);
+				EditorIntegration.prefabs_students_names.Add(newStudentObj.name);
+				EditorIntegration.prefabs_students_icons.Add(new(newStudentObj.name, studentVisual.Cut(32, 32, 110, 190, 1f))); //32x32 icon
+			}
+
 
 			yield return "Creating misc decorations...";
 			// Misc Decorations
@@ -498,6 +570,7 @@ namespace NewPlusDecorations
 			AddDecoration("SaltAndHot", "saltObjects.png", 26f);
 			AddDecoration("TheRulesBook", "TheRulesBook.png", 25f);
 			AddDecoration("PencilHolder", "PencilHolder.png", 25f);
+			AddDecoration("DinnerMenu", "DinnerMenu.png", 16f);
 
 			SpriteRenderer AddDecoration(string name, string fileName, float pixelsPerUnit)
 			{
@@ -585,8 +658,9 @@ namespace NewPlusDecorations
 
 			PostSetup(man);
 		}
-
-		const int loadSteps = 21;
+		#region LoadStepCount
+		const int loadSteps = 25;
+		#endregion
 
 		GameObject SetupObjCollisionAndScale(GameObject obj, Vector3 navMeshSize, float newScale, bool automaticallyContainer = true, bool addMeshCollider = true)
 		{
