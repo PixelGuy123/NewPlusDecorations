@@ -84,9 +84,9 @@ namespace NewPlusDecorations.Patches
 			AddVisualWithCustomBoxCollider("pavementLcover", new(5f, 1f, 5f), Vector3.zero);
 			AddVisualWithCustomBoxCollider("pavementRcover", new(5f, 1f, 5f), Vector3.zero);
 			AddVisual("PlaygroundBush");
-			AddVisual("GreenBird");
-			AddVisual("OrangeBird");
-			AddVisual("PurpleBird");
+			AddVisualWithCustomSphereCollider("GreenBird", Vector3.up * 2f, 2f).gameObject.DestroySpriteRotators();
+			AddVisualWithCustomSphereCollider("OrangeBird", Vector3.up * 2f, 2f).gameObject.DestroySpriteRotators();
+			AddVisualWithCustomSphereCollider("PurpleBird", Vector3.up * 2f, 2f).gameObject.DestroySpriteRotators();
 			AddVisual("MetalChair");
 			AddVisual("MetalDesk");
 			AddVisualWithCustomSphereCollider("SmallPottedPlant", Vector3.zero);

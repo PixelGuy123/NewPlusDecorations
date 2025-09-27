@@ -25,16 +25,15 @@ namespace NewPlusDecorations
 			return newSpr;
 		}
 
+		public static void DestroySpriteRotators(this GameObject rootObject)
+		{
+			foreach (var rotator in rootObject.GetComponentsInChildren<AnimatedSpriteRotator>()) // What else did you expected this method would do?
+				Object.Destroy(rotator);
+		}
+
 		public static void ReplaceAnimatedRotators(this GameObject rootObject)
 		{
-			AnimatedSpriteRotator[] animatedRotators = rootObject.GetComponentsInChildren<AnimatedSpriteRotator>(); // Get all rotators
-
-			if (animatedRotators.Length == 0)
-			{
-				return;
-			}
-
-			foreach (var animatedRotator in animatedRotators)
+			foreach (var animatedRotator in rootObject.GetComponentsInChildren<AnimatedSpriteRotator>())
 			{
 				GameObject targetGameObject = animatedRotator.gameObject;
 				Sprite targetSprite = animatedRotator.targetSprite ?? animatedRotator.renderer.sprite; // A failsafe for this case
@@ -66,7 +65,7 @@ namespace NewPlusDecorations
 				if (!wasFound)
 				{
 					Debug.LogWarning($"Could not find targetSprite {targetSprite?.name} in the sprite maps for the rotator on {targetGameObject.name}.", targetGameObject);
-					continue;
+					return;
 				}
 
 				//New spriterotator data here
@@ -84,7 +83,7 @@ namespace NewPlusDecorations
 					continue;
 				}
 
-				int shift = Mathf.RoundToInt(angleCount * 0.25f); // quarter rotation step
+				int shift = Mathf.RoundToInt(angleCount * 0.25f); // quarter rotation step to shift -90°
 				for (int i = 0; i < angleCount; i++)
 				{
 					newSprites[(i + shift) % angleCount] = sourceSheet[foundSpriteId + i];
@@ -107,6 +106,13 @@ namespace NewPlusDecorations
 			c.size = size;
 			c.isTrigger = isTrigger;
 			return c;
+		}
+		public static BoxCollider AddChildBlockRaycast(this GameObject g, Vector3 center, Vector3 size)
+		{
+			var blockObj = new GameObject("BlockRaycaster"); // Uses default layer, which already blocks raycast
+			blockObj.transform.SetParent(g.transform);
+			blockObj.transform.localPosition = Vector3.zero;
+			return blockObj.AddBoxCollider(center, size, true);
 		}
 		public static NavMeshObstacle AddNavObstacle(this GameObject g, Vector3 size) =>
 			g.AddNavObstacle(Vector3.zero, size);

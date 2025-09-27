@@ -336,6 +336,7 @@ namespace NewPlusDecorations
 			slide = SetupObjCollisionAndScale(LoadObjFile("DinnerSeat"), default, 1f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
 			slide.AddBoxCollider(Vector3.up * 5f, new(12f, 10f, 4f), false);
+			slide.AddChildBlockRaycast(new(0f, 5f, -1.2f), new(12f, 10f, 1.7f));
 			slide.AddNavObstacle(Vector3.up * 5f, new(12.5f, 10f, 4.5f));
 			slide.name = "DinnerSeat";
 			AddObjectToEditor(slide);
@@ -382,7 +383,7 @@ namespace NewPlusDecorations
 			slide = SetupObjCollisionAndScale(LoadObjFile("Planter"), default, 1f, addMeshCollider: false);
 			slide.layer = LayerStorage.ignoreRaycast;
 			slide.AddBoxCollider(Vector3.up * 2f, new(10f, 4f, 10f), false);
-			slide.AddNavObstacle(Vector3.up * 2f, new(10.5f, 4f, 10.5f));
+			slide.AddNavObstacle(Vector3.up * 5f, new(10.5f, 10f, 10.5f));
 			slide.name = "Planter";
 			AddObjectToEditor(slide);
 
