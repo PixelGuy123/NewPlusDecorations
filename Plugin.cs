@@ -390,18 +390,17 @@ namespace NewPlusDecorations
 			yield return "Loading the CardboardBox obj";
 			slide = SetupObjCollisionAndScale(LoadObjFile("CardboardBox"), default, 0.99f, addMeshCollider: false);
 
-			slide.AddNavObstacle(Vector3.up * 5f, new(8f, 10f, 8f));
+			slide.AddNavObstacle(Vector3.up * 5f, new(5f, 10f, 5f));
 			slide.name = "CardboardBox";
 
 			var cardboardBox = slide.AddComponent<CardboardBox>();
+			cardboardBox.collider = slide.AddBoxCollider(Vector3.up * 5f, new(4.99f, 10f, 4.99f), false);
 			cardboardBox.audNope = ((ITM_PortalPoster)ItemMetaStorage.Instance.FindByEnum(Items.PortalPoster).value.item).audNo;
 			cardboardBox.audSlide = ObjectCreators.CreateSoundObject(AssetLoader.AudioClipFromFile(Path.Combine(path, "CardboardBox_Slide.wav")), string.Empty, SoundType.Effect, Color.white);
 			cardboardBox.audSlide.subtitle = false;
-			cardboardBox.audMan = slide.CreatePropagatedAudioManager(45f, 85f);
-
-			cardboardBox.collider = slide.AddBoxCollider(Vector3.up * 5f, new(5f, 10f, 5f), false);
-
 			AddObjectToEditor(slide);
+
+			cardboardBox.audMan = slide.CreatePropagatedAudioManager(45f, 85f);
 
 			yield return "Loading the Swingset obj...";
 			slide = SetupObjCollisionAndScale(LoadObjFile("Swingset"), new(15f, 10f, 4.5f), 0.3f, addMeshCollider: false);
