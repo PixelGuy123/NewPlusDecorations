@@ -17,7 +17,8 @@ namespace NewPlusDecorations.Components
 		public void ClickableSighted(int player) { }
 		public void ClickableUnsighted(int player) { }
 		public bool ClickableHidden() => !IsClosed;
-		public bool ClickableRequiresNormalHeight() => true;
+        public void ClickableInSight(int player) { }
+        public bool ClickableRequiresNormalHeight() => true;
 		IEnumerator OpenTimer()
 		{
 			collider.enabled = false;

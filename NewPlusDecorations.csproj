@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net46</TargetFramework>
+    <TargetFramework>net481</TargetFramework>
     <AssemblyName>NewPlusDecorations</AssemblyName>
     <Description>Adds new decorations to BB+</Description>
     <Version>1.2.2</Version>
@@ -28,21 +28,19 @@
     <Reference Include="netstandard">
       <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\netstandard.dll</HintPath>
     </Reference>
-    <Reference Include="PixelInternalAPI">
-      <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PixelInternalAPI.dll</HintPath>
-    </Reference>
-     <Reference Include="PlusLevelStudio">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusLevelStudio.dll</HintPath>
-	 </Reference>
-
-   <Reference Include="PlusStudioLevelFormat">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusStudioLevelFormat.dll</HintPath>
-	 </Reference>
-
-   <Reference Include="PlusStudioLevelLoader">
-	   <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\newEditor\PlusStudioLevelLoader.dll</HintPath>
-	 </Reference>
 	<Reference Include="C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\Assembly-CSharp.dll" Publicize="true" />
+	<Reference Include="PixelInternalAPI">
+	  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PixelInternalAPI.dll</HintPath>
+	</Reference>
+	<Reference Include="PlusLevelStudio">
+	  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusLevelStudio.dll</HintPath>
+	</Reference>
+	<Reference Include="PlusStudioLevelFormat">
+	  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusStudioLevelFormat.dll</HintPath>
+	</Reference>
+	<Reference Include="PlusStudioLevelLoader">
+	  <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BepInEx\plugins\PlusStudioLevelLoader.dll</HintPath>
+	</Reference>
 	<Reference Include="UnityEngine.UI">
 	  <HintPath>C:\Program Files (x86)\Steam\steamapps\common\Baldi's Basics Plus\BALDI_Data\Managed\UnityEngine.UI.dll</HintPath>
 	</Reference>

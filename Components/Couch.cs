@@ -26,8 +26,8 @@ namespace NewPlusDecorations.Components
 		public void ClickableUnsighted(int player) { }
 		public bool ClickableHidden() => beingUsed;
 		public bool ClickableRequiresNormalHeight() => true;
-
-		IEnumerator PlayerInCouch(PlayerManager pm)
+        public void ClickableInSight(int player) { }
+        IEnumerator PlayerInCouch(PlayerManager pm)
 		{
 
 			Vector3 tarPos = transform.position + transform.forward * 4.5f;
