@@ -112,6 +112,7 @@ public class CardboardBox : EnvironmentObject, IItemAcceptor, IClickable<int>
     public bool ClickableHidden() => sliding;
 
     public bool ClickableRequiresNormalHeight() => true;
+    public void ClickableInSight(int player) { }
 
     Coroutine goToCoroutine;
     bool sliding = false;

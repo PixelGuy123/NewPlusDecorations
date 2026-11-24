@@ -26,8 +26,8 @@ namespace NewPlusDecorations.Components
 		public void ClickableUnsighted(int player) { }
 		public bool ClickableRequiresNormalHeight() => false;
 		public bool ClickableHidden() => isHidingPlayer;
-
-		bool isHidingPlayer = false;
+        public void ClickableInSight(int player) { }
+        bool isHidingPlayer = false;
 
 		[SerializeField]
 		internal Canvas hud;
@@ -70,5 +70,6 @@ namespace NewPlusDecorations.Components
 			isHidingPlayer = false;
 			audMan.PlaySingle(audLeave);
 		}
-	}
+
+    }
 }
